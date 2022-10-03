@@ -166,34 +166,7 @@ Wifi_RespStatus loadWiFiAPConfig(void)
 #include "Config/DEV_Config.h"
 #include "GUI/GUI_Paint.h"
 #include "e-Paper/ImageData.h"
-static void low_bat_img(void)
-{
-	uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
-	uint8_t d_red[(EPD_WIDTH/8) * EPD_HEIGHT];
-	//black & grey
-	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
-	Paint_NewImage(d_red, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
 
-	Paint_SelectImage(d_black);
-	Paint_Clear(WHITE);
-	Paint_SelectImage(d_red);
-	Paint_Clear(WHITE);
-
-	Paint_SelectImage(d_black);
-	Paint_DrawRectangle(30, 30, 170, 100, BLACK, DRAW_FILL_EMPTY, DOT_PIXEL_6X6);
-	Paint_DrawRectangle(170, 50, 180, 80, BLACK, DRAW_FILL_EMPTY, DOT_PIXEL_6X6);
-	Paint_DrawRectangle(36, 36, 60, 94, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
-
-	Paint_DrawString(23, 140, "LOW BATTERY", &Font20, WHITE, BLACK);
-
-	Paint_SelectImage(d_red);
-	Paint_DrawRectangle(36, 36, 60, 94, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
-	Paint_DrawString(23, 140, "LOW BATTERY", &Font20, WHITE, BLACK);
-
-	EPD_Display(d_black, d_red);
-
-
-}
 
 /* USER CODE END 0 */
 
@@ -246,7 +219,11 @@ int main(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
   system_init();
 
-  //low_bat_img();
+  if(system_batteryLevel() == 0 && !system_isCharging())
+  {
+	  show_low_bat_image();
+	  system_shutdown();
+  }
 
   //test
 //  HAL_Delay(250);

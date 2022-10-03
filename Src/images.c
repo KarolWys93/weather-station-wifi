@@ -103,3 +103,31 @@ void show_configMode_image(void)
 	EPD_SendBlackAndGrey(d_black, d_grey);
 	EPD_Refresh();
 }
+
+void show_low_bat_image(void)
+{
+	uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
+	uint8_t d_red[(EPD_WIDTH/8) * EPD_HEIGHT];
+	//black & grey
+	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
+	Paint_NewImage(d_red, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
+
+	Paint_SelectImage(d_black);
+	Paint_Clear(WHITE);
+	Paint_SelectImage(d_red);
+	Paint_Clear(WHITE);
+
+	Paint_SelectImage(d_black);
+	Paint_DrawRectangle(30, 30, 170, 100, BLACK, DRAW_FILL_EMPTY, DOT_PIXEL_6X6);
+	Paint_DrawRectangle(170, 50, 180, 80, BLACK, DRAW_FILL_EMPTY, DOT_PIXEL_6X6);
+	Paint_DrawRectangle(36, 36, 60, 94, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+
+	Paint_DrawString(23, 140, "LOW BATTERY", &Font20, WHITE, BLACK);
+
+	Paint_SelectImage(d_red);
+	Paint_DrawRectangle(36, 36, 60, 94, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	Paint_DrawString(23, 140, "LOW BATTERY", &Font20, WHITE, BLACK);
+
+	EPD_Display(d_black, d_red);
+
+}

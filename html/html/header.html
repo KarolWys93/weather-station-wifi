@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-md shadow-sm p-3 mb-5 rounded" style="background-image: linear-gradient( 135deg, #FDEB71 10%, #F8D800 100%);">
+  <div class="container-xxl flex-wrap flex-md-nowrap">
+    <a class="navbar-brand" href="/index.html">
+		<img src="img/weather-icon.png" alt="" width="40" height="34" class="d-inline-block align-top">
+		Weather Station
+	</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav nav-pills me-auto mb-2 mb-lg-0" id="navItems">
+	  	<li class="nav-item col-6 col-md-auto"><a class="nav-link p-2" href="index.html">Home</a></li>
+		<li class="nav-item col-6 col-md-auto"><a class="nav-link p-2" href="forecast.html">Forecast</a></li>
+		<li class="nav-item col-6 col-md-auto"><a class="nav-link p-2" href="wifi-con.html">Wi-Fi connection</a></li>
+		<li class="nav-item col-6 col-md-auto"><a class="nav-link p-2" href="wifi-ap.html">Access Point</a></li>
+		<li class="nav-item col-6 col-md-auto"><a class="nav-link p-2" href="system.html">System</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<script>
+$(function(){
+	var current = location.pathname;
+	if(current == "/")
+	{
+		current = "index.html"
+	}
+	$('#navItems li a').each(function(){
+		var $this = $(this);
+		// if the current path is like this link, make it active
+		if($this.attr('href').indexOf(current) !== -1){
+			$this.addClass('active');
+		}
+	})
+})
+</script>

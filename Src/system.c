@@ -53,13 +53,17 @@ static uint32_t startTimestamp = 0;
 #define BAT_VOLTAGE_0      3330 //3330 mV
 
 #define BAT_VOLTAGE_SAMPLES 8
+#define BAT_VOLT_FILTER_DATA 8
+
 static volatile uint16_t batteryAdcData[BAT_VOLTAGE_SAMPLES*2];
 static volatile uint32_t batteryVoltage = UINT32_MAX;
 static volatile uint8_t bat_adc_is_runing = 0;
 
+//private functions
 static void shutdownSystem(void);
 static void cardMountFailed(void);
 static void startBatteryMeasurment(void);
+static uint32_t filterVoltageValue(uint32_t voltage);
 
 
 void system_init(void)
@@ -212,7 +216,6 @@ uint8_t system_isConfigModeOn(void)
 	return systemConfig.configMode;
 }
 
-
 uint8_t system_isCharging(void)
 {
 	if(GPIO_PIN_SET == HAL_GPIO_ReadPin(BAT_CHR_GPIO_Port, BAT_CHR_Pin))
@@ -237,23 +240,31 @@ uint32_t system_batteryVoltage(void)
 uint8_t system_batteryLevel(void)
 {
 	uint32_t batteryVoltage = system_batteryVoltage();
+	uint32_t tmpVoltage;
+	uint8_t batteryLevel = 0xFF;
 
 	if(batteryVoltage == UINT32_MAX)
 	{
-		return 0xFF;
+		return batteryLevel;
 	}
 
-	if(batteryVoltage > BAT_VOLTAGE_100)
+	tmpVoltage = batteryVoltage;
+
+	if(tmpVoltage > BAT_VOLTAGE_100)
 	{
-		batteryVoltage = BAT_VOLTAGE_100;
+		tmpVoltage = BAT_VOLTAGE_100;
 	}
 
-	if(batteryVoltage < BAT_VOLTAGE_0)
+	if(tmpVoltage < BAT_VOLTAGE_0)
 	{
-		batteryVoltage = BAT_VOLTAGE_0;
+		tmpVoltage = BAT_VOLTAGE_0;
 	}
 
-	return ((batteryVoltage-BAT_VOLTAGE_0) * 100) / (BAT_VOLTAGE_100 - BAT_VOLTAGE_0);
+	batteryLevel = ((tmpVoltage-BAT_VOLTAGE_0) * 100) / (BAT_VOLTAGE_100 - BAT_VOLTAGE_0);
+
+	Logger(LOG_INF, "Battery: %lu mV, %u%%, (%u)", batteryVoltage, batteryLevel, system_isCharging());
+
+	return batteryLevel;
 }
 
 void system_sleep(uint32_t miliseconds)
@@ -333,8 +344,6 @@ uint8_t system_restoreDefault(void)
 	return result;
 }
 
-
-
 static void shutdownSystem(void)
 {
 	Logger(LOG_INF, "System shutdown");
@@ -356,8 +365,39 @@ static void cardMountFailed(void)
 
 static void startBatteryMeasurment(void)
 {
+	HAL_GPIO_WritePin(BAT_ADC_GND_GPIO_Port, BAT_ADC_GND_Pin, GPIO_PIN_RESET);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) batteryAdcData, BAT_VOLTAGE_SAMPLES*2);
 	bat_adc_is_runing = 1;
+}
+
+static uint32_t filterVoltageValue(uint32_t voltage)
+{
+	static volatile bool isInitiated = false;
+	static volatile uint32_t batteryVoltageHistory[BAT_VOLT_FILTER_DATA];
+	static volatile uint8_t index = 0;
+
+	if(!isInitiated)
+	{
+		for(uint8_t i = 0; i < BAT_VOLT_FILTER_DATA; i++)
+		{
+			batteryVoltageHistory[i] = voltage;
+		}
+		isInitiated = true;
+		return voltage;
+	}
+	else
+	{
+		uint32_t tmp = 0;
+		batteryVoltageHistory[index++] = voltage;
+		index %= BAT_VOLT_FILTER_DATA;
+
+		for(uint8_t i = 0; i < BAT_VOLT_FILTER_DATA; i++)
+		{
+			tmp += batteryVoltageHistory[i];
+		}
+
+		return tmp/BAT_VOLT_FILTER_DATA;
+	}
 }
 
 //battery voltage measurment callback
@@ -368,6 +408,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	const uint32_t divFacttor2 = 43;    //R1+R2
 	uint32_t batteryADC = 0;
 	uint32_t refVoltADC = 0;
+
+	HAL_GPIO_WritePin(BAT_ADC_GND_GPIO_Port, BAT_ADC_GND_Pin, GPIO_PIN_SET);
 
 	for(uint8_t i = 0; i < BAT_VOLTAGE_SAMPLES*2; i+=2)
 	{
@@ -383,6 +425,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 
 	//voltage divider
 	batteryVoltage = (batteryVoltage*divFacttor2)/divFacttor1;
+
+	batteryVoltage = filterVoltageValue(batteryVoltage);
 
 	bat_adc_is_runing = 0;
 }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weather Station</title>
+<script src="/scripts/jquery-3.5.1.min.js"></script>
+<link href="/ccs/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<script>
+	$(document).ready(function(){
+		$("header").load("/header.html");
+	});
+	</script>
+	<header>
+	<div id="header"></div>
+	</header>
+	
+	<div class="container-xxl">
+		<div class="row justify-content-center">
+			<div class="col-8">
+				<h1>System</h1>
+				<p> General system settings </p>
+				<div id="alert_container" style="display: none;"></div>
+				<form><fieldset class="row g-3">
+					<div class="col-10">
+						<label for="device_name" class="form-label">Device name</label>
+						<input type="text" class="form-control" id="device_name" name="device_name" maxlength="32" placeholder="name" required>
+					</div>
+					<div class="col-2 align-self-end align-middle">
+						<button id="name_submit_button" type="button" class="btn btn-primary">Save</button>
+					</div>
+					<small id="deviceNameHelpBlock" class="form-text text-muted">
+						The device name can be up to 32 characters long.
+					</small>
+					<div class="col-12">
+						<div class="form-check form-switch">
+							<input class="form-check-input" type="checkbox" value="1" id="led_ind" name="led_ind" checked>
+							<label class="form-check-label" for="led_ind">LED indicator enabled</label>
+						</div>
+						<small id="deviceNameHelpBlock" class="form-text text-muted">
+							The LED indicator tells you when the device is active.
+						</small>
+					</div>
+				</fieldset></form>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-8 g-3">
+				<div class="d-flex w-100 align-items-center justify-content-evenly flex-wrap">
+					<div class="p-2 flex-grow"><button type="button" id="restart" class="btn btn-outline-success">Restart device</button></div>
+					<div class="p-2 flex-grow"><button type="button" id="restart_in_conf" class="btn btn-outline-warning">Restart in configuration mode</button></div>
+					<div class="p-2 flex-grow"><button type="button" id="restore_settings" class="btn btn-outline-danger">Restore factory settings</button></div>
+				</div>
+			</div>
+		</div>
+		<div class="text-center" id="waiting_anim">
+			<div class="spinner-grow text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	</div>
+	<script>
+		$(document).ready(function()
+		{
+			$("#restart").click(function(event){restartDevice("/api/restart", "Are you sure you want to restart the device?", "Device restarting.", "Device connection failed. Try again.")});
+			$("#restart_in_conf").click(function(event){restartDevice("/api/restart_conf", "Are you sure you want to restart the device?", "Device restarting. Refresh the page in a few seconds.", "Device connection failed. Try again.")});
+			$("#restore_settings").click(function(event){restartDevice("/api/restore_config", "Are you sure you want to restore factory settings?", "Factory settings restored.", "Device connection failed. Try again.")});
+			$("#name_submit_button").click(function(event)
+			{
+				event.preventDefault();
+				var form = $("form");
+				var jsonData = {};
+				jsonData["device_name"] = $("#device_name").val();
+				var data = JSON.stringify(jsonData);
+				console.log(data);
+				$("#waiting_anim").show();
+				$("#name_submit_button").attr("disabled", true);
+				
+				$.post("/api/device_name", data, function(resp){
+					$("#alert_container").html('<div class="alert alert-success" role="alert"><strong>Success!</strong> The device name has been changed. The changes will be visible after restarting the device.</div>').fadeIn();
+				}, "json")
+				.fail(function(){
+					$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Error:</strong> Device connection failed. Try again.</div>').fadeIn();
+				})
+				.always(function(){
+					$("#name_submit_button").removeAttr("disabled");
+					$("#waiting_anim").hide();
+				});
+			});
+			
+			$("#led_ind").change(function(){
+				var led_ind = $("#led_ind").prop("checked");
+				var jsonData = {};
+				jsonData["led_ind"] = (led_ind === true ? 1 : 0);
+				var data = JSON.stringify(jsonData);
+				console.log(data);
+				$("#waiting_anim").show();
+				$("#led_ind").attr("disabled", true);
+				$.post("/api/led_ind", data, function(resp){$("#alert_container").fadeOut();}, "json")
+				.fail(function(){
+					$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Error:</strong> Device connection failed. Try again.</div>').fadeIn();
+				})
+				.always(function(){
+					$("#led_ind").removeAttr("disabled");
+					$("#waiting_anim").hide();
+				});
+			});
+			
+			$.getJSON("/api/system_conf", function(data){
+				$("#device_name").val(data.device_name);
+				$("#led_ind").attr("checked", data.led_ind === 1);
+			}).always(function(){
+				$("#waiting_anim").hide();
+			});
+			
+			function restartDevice(endpoint, message_str, success_str, error_str)
+			{
+				result = window.confirm(message_str);
+				if(result)
+				{
+					$.get(endpoint, function(resp){
+						$("#alert_container").html('<div class="alert alert-success" role="alert"><strong>Success!</strong> ' + success_str + '</div>').fadeIn();
+					})
+					.fail(function(){
+						$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Error:</strong> ' + error_str + '</div>').fadeIn();
+					});
+				}
+			}
+		});
+	</script>
+	<script src="/scripts/bootstrap.bundle.min.js"></script>
+</body>
+</html>

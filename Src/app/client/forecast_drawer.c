@@ -40,6 +40,7 @@ void drawForecast(const SForecast * const forecastData)
 {
 	SRangesValues ranges;
 	uint8_t battery = system_batteryLevel();
+	uint8_t isCharging = system_isCharging();
 
 	uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
@@ -225,7 +226,14 @@ void drawForecast(const SForecast * const forecastData)
 
 	Paint_SelectImage(d_black);
 
-	Paint_DrawRectangle(0, 0, battery*2, 3, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	if(!isCharging)
+	{
+		Paint_DrawRectangle(0, 0, battery*2, 3, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	}
+	else
+	{
+		Paint_DrawRectangle(0, 0, 199, 3, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	}
 
 	EPD_SendBlackAndGrey(d_black, d_grey);
 
@@ -283,10 +291,11 @@ void drawForecast(const SForecast * const forecastData)
 		Paint_DrawRectangle(4*(i)+31, start, 4*(i)+34, end, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
 	}
 
-	if(system_isCharging())
+	if(isCharging)
 	{
-		Paint_DrawRectangle(0, 0, battery*2, 3, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+		Paint_DrawRectangle(0, 0, 199, 3, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
 	}
+
 	EPD_SendRed(d_red);
 	system_sleep(2);
 

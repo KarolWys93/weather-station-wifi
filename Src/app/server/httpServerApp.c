@@ -17,6 +17,8 @@
 #include "logger.h"
 #include "utils.h"
 
+#include "images.h"
+
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -425,6 +427,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 {
 	char requestBuffer[HTTP_SERVER_REQUEST_SIZE];
 	g_linkID = 0;
+	uint32_t secondCounter = 0;
 	uint32_t tickTime = 0;
 	int8_t status = 0;
 	bool timeIsSynced = false;
@@ -446,8 +449,13 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 	g_serverRun = true;
 	while(g_serverRun)
 	{
+		//every 1 second
 		if(HAL_GetTick() - tickTime > 1000)
 		{
+			secondCounter++;
+
+			Logger_sync();
+
 			WiFi_UpdateStatus(2000);
 			tickTime = HAL_GetTick();
 
@@ -455,7 +463,18 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 			{
 				timeIsSynced = timeSync(0);
 			}
-		}
+
+			//every 5 second
+			if(secondCounter % 5 == 0)
+			{
+				//power check
+				if(system_batteryLevel() == 0 && !system_isCharging())
+				{
+					show_low_bat_image();
+					system_shutdown();
+				}
+			}
+	    }
 
 		volatile SWiFiLinkStatus* linkStatus = &wifiStatus.linksStatus[g_linkID];
 
@@ -481,7 +500,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 		}
 
 		g_linkID = (g_linkID+1)%5;
-		Logger_sync();
+
 		HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
 	}
 

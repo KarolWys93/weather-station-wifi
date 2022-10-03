@@ -105,6 +105,7 @@ void runForecastApp(void)
     	{
     		show_error_image(ERR_IMG_GENERAL, "forecast req error");
     	}
+    	return;
     }
 #endif
 
@@ -114,6 +115,7 @@ void runForecastApp(void)
     if(result != 0)
     {
     	show_error_image(ERR_IMG_GENERAL, "forecast error");
+    	return;
     }
 
     //draw forecast

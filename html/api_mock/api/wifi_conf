@@ -1,0 +1,7 @@
+{
+	"wifi_ssid": "Testowa Sieć",
+	"dhcp": 1,
+	"wifi_ip": "192.168.0.150",
+	"wifi_mask": "255.255.255.0",
+	"wifi_gw": "192.168.0.1"
+}

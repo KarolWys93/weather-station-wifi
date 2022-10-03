@@ -890,7 +890,7 @@ HTTP_STATUS serverAPI_voltage_test(char* request, uint32_t reqSize)
 {
 	char responseBuff[256];
 
-	sprintf(responseBuff, "{\"voltage\":\"%d\",\"bat_lvl\":%d,\"bat_chr\":%d}", system_batteryVoltage(), system_batteryLevel(), system_isCharging());
+	sprintf(responseBuff, "{\"voltage\":\"%lu\",\"bat_lvl\":%u,\"bat_chr\":%u}", system_batteryVoltage(), system_batteryLevel(), system_isCharging());
 
 	return sendResponse(200, responseBuff, strlen(responseBuff));
 }

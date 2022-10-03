@@ -17,5 +17,6 @@ typedef enum ERR_IMAGE
 
 void show_error_image(ERR_IMAGE errImg, char* errText);
 void show_configMode_image(void);
+void show_low_bat_image(void);
 
 #endif /* IMAGES_H_ */

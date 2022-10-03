@@ -1,0 +1,32 @@
+[
+	{
+		"ssid":"2.4G-Klapki\"Mojzesza\"_RPT",
+		"rssi":-40,
+		"enc":4
+	},
+	{
+		"ssid":"PLAY Internet 4G LTE-B61C",
+		"rssi":-60,
+		"enc":0
+	},
+		{
+		"ssid":"Lisie Królestwo",
+		"rssi":-68,
+		"enc":3
+	},
+	{
+		"ssid":"Potato_Tomato 128",
+		"rssi":-75,
+		"enc":4
+	},
+	{
+		"ssid":"FUN_BOX",
+		"rssi":-80,
+		"enc":2
+	},
+	{
+		"ssid":"1234567890123456789012345678901234567890",
+		"rssi":-80,
+		"enc":2
+	}
+]

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weather Station</title>
+<script src="scripts/jquery-3.5.1.min.js"></script>
+<link href="ccs/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<script>
+	$(document).ready(function(){
+		$("header").load("header.html");
+	});
+	</script>
+	<header>
+	<div id="header"></div>
+	</header>
+	
+	<div class="container-xxl">
+		<div class="row justify-content-center">
+			<div class="col-8">
+				<h1>Device status</h1>
+				<div id="alert_container" style="display: none;"><div class="alert alert-danger" role="alert"><strong>Error:</strong> Device doesn't response. Check connection.</div></div>
+				<table class="table table-striped">
+					<tr>
+						<th>Wi-Fi SSID</td>
+						<td id="wifi_name">-</td>
+					</tr>
+					<tr>
+						<th>Wi-Fi Status</td>
+						<td id="wifi_status">-</td>
+					</tr>
+					<tr>
+						<th>IP Address</td>
+						<td id="ip_address">-</td>
+					</tr>
+					<tr>
+						<th>Battery</td>
+						<td id="battery">-</td>
+					</tr>
+					<tr>
+						<th>Firmware version</td>
+						<td id="firm_version">-</td>
+					</tr>
+					<tr>
+						<th>Wi-Fi module version</td>
+						<td id="wifi_version">-</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="text-center" id="waiting_anim">
+			<div class="spinner-grow text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	</div>
+	<script src="scripts/bootstrap.bundle.min.js"></script>
+	<script>
+		function getDeviceStatus()
+		{
+			$.getJSON("api/status", function(data){
+				console.log("device status");
+				console.log(data);
+				$("#wifi_name").text(data.wifi_ssid);
+				$("#firm_version").text(data.ver);
+				$("#wifi_version").text(data.ver_wifi);
+				$("#ip_address").text(data.ip_addr);
+				$("#battery").text(data.bat + "%");
+				
+				if(data.wifi_stat === 1)
+				{
+					$("#wifi_status").html('<span class="text-success">connected</span>');
+				}
+				else
+				{
+					$("#wifi_status").html('<span class="text-danger">disconnected</span>');
+				}
+
+				if(data.charging === 1)
+				{
+					$("#battery").append(" (charging)");
+				}
+				
+				if(data.bat <= 25)
+				{
+					$("#battery").addClass('text-danger');
+				}
+				else
+				{
+					$("#battery").removeClass('text-danger');
+				}
+				$("#alert_container").fadeOut();
+			}).fail(function(){
+				$("#alert_container").fadeIn();
+			}).always(function(){
+				$("#waiting_anim").hide();
+			});
+		}
+
+		$(document).ready(function(){
+			getDeviceStatus();
+			setInterval(getDeviceStatus, 20000);
+		});
+	</script>
+</body>
+</html>
