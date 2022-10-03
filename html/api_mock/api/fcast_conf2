@@ -1,6 +1,6 @@
 {
 	"api_key":"1234567890asdfghjklpqwertyuiop32",
 	"refresh":2,
-	"country":"PL",
-	"zip_code":"12-345"
+	"lon": "89.9999999",
+	"lat": "89.9999999"
 }

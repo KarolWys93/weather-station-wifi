@@ -66,7 +66,6 @@
 				$("#firm_version").text(data.ver);
 				$("#wifi_version").text(data.ver_wifi);
 				$("#ip_address").text(data.ip_addr);
-				$("#battery").text(data.bat + "%");
 				
 				if(data.wifi_stat === 1)
 				{
@@ -79,7 +78,13 @@
 
 				if(data.charging === 1)
 				{
-					$("#battery").append(" (charging)");
+					$("#battery").addClass('text-success');
+					$("#battery").text("DC adapter");
+				}
+				else
+				{
+					$("#battery").removeClass('text-success');
+					$("#battery").text(data.bat + "%");
 				}
 				
 				if(data.bat <= 25)

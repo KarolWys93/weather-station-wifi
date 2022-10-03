@@ -365,9 +365,12 @@ static void cardMountFailed(void)
 
 static void startBatteryMeasurment(void)
 {
-	HAL_GPIO_WritePin(BAT_ADC_GND_GPIO_Port, BAT_ADC_GND_Pin, GPIO_PIN_RESET);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) batteryAdcData, BAT_VOLTAGE_SAMPLES*2);
-	bat_adc_is_runing = 1;
+	if(!system_isCharging())
+	{
+		HAL_GPIO_WritePin(BAT_ADC_GND_GPIO_Port, BAT_ADC_GND_Pin, GPIO_PIN_RESET);
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t*) batteryAdcData, BAT_VOLTAGE_SAMPLES*2);
+		bat_adc_is_runing = 1;
+	}
 }
 
 static uint32_t filterVoltageValue(uint32_t voltage)
