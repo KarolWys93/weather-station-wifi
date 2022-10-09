@@ -27,7 +27,6 @@
 #include "system.h"
 
 #define RETRY_TIME 5 //min
-#define FILE_PATH_FCAST_TMP "/forecast.tmp"
 
 typedef struct SForecastConfig
 {
@@ -42,7 +41,8 @@ typedef struct SForecastConfig
 static uint8_t readForecastConfig(SForecastConfig* forecastConfig);
 static int16_t sendGetRequest(char* host, uint16_t port, char* path, char* dataBuff, uint16_t dataBuffSize);
 static uint8_t geolocationRequest(SForecastConfig *forecastConfig);
-static uint8_t forecastRequest(SForecastConfig* forecastConfig);
+//static uint8_t forecastRequest(SForecastConfig* forecastConfig);
+static uint8_t forecastRequest2(SForecastConfig* forecastConfig);
 
 void runForecastApp(void)
 {
@@ -50,9 +50,9 @@ void runForecastApp(void)
 	struct tm * timeStruct;
 	uint8_t result = 0;
     SForecastConfig forecastConf;
-    SForecast forecast;
+//    SForecast forecast;
+    SForecast forecast2;
 
-#if 1
 	if(!waitForConnection(10))
 	{
 		Logger(LOG_WRN, "Cannot connect to WiFi");
@@ -62,7 +62,15 @@ void runForecastApp(void)
 	}
 
 	timeSync(5);
-#endif
+
+	if(OLD_TIME_STAMP >= RTC_getTime())
+	{
+		Logger(LOG_ERR, "time failed!");
+		system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+		show_error_image(ERR_IMG_GENERAL, "Time error");
+		return;
+	}
+
 	Logger(LOG_INF, "Start forecast app");
 
 	if(0 != (result = readForecastConfig(&forecastConf)))
@@ -70,16 +78,16 @@ void runForecastApp(void)
 		Logger(LOG_ERR, "Cannot read forecast config (%d)", result);
 		show_error_image(ERR_IMG_GENERAL, "forecast conf err");
 	}
-#if 1
+
 	//geolocation
-	if(strlen(forecastConf.lat) == 0)
+	if(strlen(forecastConf.lat) == 0 || strlen(forecastConf.lon) == 0)
 	{
 		if(0 != (result = geolocationRequest(&forecastConf)))
 		{
 			Logger(LOG_WRN, "geolocation failed: %d", result);
 			if(result == 2)
 			{
-				show_error_image(ERR_IMG_WIFI, "no internet");
+				show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
 				system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
 			}
 			else
@@ -91,8 +99,12 @@ void runForecastApp(void)
 	}
 
 	//get new forecast
-    f_unlink(FILE_PATH_FCAST_TMP);
-    result = forecastRequest(&forecastConf);
+//    f_unlink(FILE_PATH_FCAST_TMP);
+//    result = forecastRequest(&forecastConf);
+    f_unlink(FILE_PATH_FCAST_TMP"2");
+    result = forecastRequest2(&forecastConf);
+
+
     if(result != 0)
     {
     	Logger(LOG_WRN, "forecast req failed: %d", result);
@@ -107,10 +119,18 @@ void runForecastApp(void)
     	}
     	return;
     }
-#endif
+
+//    //forecast parsing
+//    result = parseForecast(FILE_PATH_FCAST_TMP, &forecast);
+//    Logger(LOG_INF, "forecast parsing: %d", result);
+//    if(result != 0)
+//    {
+//    	show_error_image(ERR_IMG_GENERAL, "forecast error");
+//    	return;
+//    }
 
     //forecast parsing
-    result = parseForecast(FILE_PATH_FCAST_TMP, &forecast);
+    result = parseForecast2(FILE_PATH_FCAST_TMP"2", &forecast2);
     Logger(LOG_INF, "forecast parsing: %d", result);
     if(result != 0)
     {
@@ -119,7 +139,8 @@ void runForecastApp(void)
     }
 
     //draw forecast
-    drawForecast(&forecast);
+    //drawForecast(&forecast);
+    drawForecast2(&forecast2);
     Logger(LOG_INF, "Forecast done");
 
     time = RTC_getTime();
@@ -136,10 +157,109 @@ void runForecastApp(void)
 }
 
 
-static uint8_t forecastRequest(SForecastConfig* forecastConfig)
+//static uint8_t forecastRequest(SForecastConfig* forecastConfig)
+//{
+//    char dataBuff[2048];
+//    char requestPath[150];
+//	int8_t linkID;
+//    char* msgPayload;
+//    int16_t msgSize = 0;
+//    int16_t dataRecLen = 0;
+//    UINT bw;
+//    FIL file;
+//
+//    sprintf(requestPath, "/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,alerts,daily&units=metric&appid=%s",
+//    		forecastConfig->lat, forecastConfig->lon, forecastConfig->apiKey);
+//
+//    HTTP_createRequestHeader(dataBuff, 2048, HTTP_GET, requestPath, 0);
+//    msgSize = HTTP_addHeaderField(dataBuff, 2048, "Host","api.openweathermap.org");
+//    Logger(LOG_DBG, "fcast request: %d", msgSize);
+//
+//
+//    linkID = WiFi_OpenTCPConnection("api.openweathermap.org", 80, 0);
+//    if(linkID < 0)
+//    {
+//    	return 1;
+//    }
+//
+//    //request send
+//    WiFi_SendData(linkID, (uint8_t*) dataBuff, msgSize);
+//
+//    //first package receive
+//    system_sleep(250);
+//    WiFi_UpdateStatus(1000);
+//    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0)	//TODO add timeout
+//    {
+//    	system_sleep(250);
+//    	WiFi_UpdateStatus(1000);
+//    }
+//
+//    dataRecLen = wifiStatus.linksStatus[linkID].dataWaiting;
+//    if(dataRecLen > 2048) dataRecLen = 2048;
+//    WiFi_ReadData(linkID, (uint8_t*) dataBuff, dataRecLen, 1000);
+//
+//    if(HTTP_getResponseCode(dataBuff, dataRecLen) != 200)
+//    {
+//    	Logger(LOG_WRN, "Forecast response code: %d", HTTP_getResponseCode(dataBuff, dataRecLen));
+//    	return 2;
+//    }
+//
+//    msgSize = HTTP_getContentSize(dataBuff, dataRecLen);
+//    msgPayload = HTTP_getContent(dataBuff, dataRecLen);
+//
+//    Logger(LOG_DBG, "Forecast size: %d", msgSize);
+//
+//    if(FR_OK == f_open(&file, FILE_PATH_FCAST_TMP, FA_OPEN_ALWAYS | FA_WRITE))
+//    {
+//    	FRESULT result;
+//    	result = f_write(&file, msgPayload, dataRecLen - (msgPayload-dataBuff), &bw);
+//    	if(FR_OK != result)
+//    	{
+//    		f_close(&file);
+//    		WiFi_CloseConnection(linkID);
+//    		return 3;
+//    	}
+//
+//    	msgSize -= (dataRecLen - (msgPayload-dataBuff));
+//    	while(msgSize > 0)
+//    	{
+//    		WiFi_UpdateStatus(1000);
+//    	    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0) 	//TODO add timeout
+//    	    {
+//    	    	system_sleep(250);
+//    	    	WiFi_UpdateStatus(1000);
+//    	    }
+//    	    dataRecLen = wifiStatus.linksStatus[linkID].dataWaiting;
+//    	    if(dataRecLen > 2048) dataRecLen = 2048;
+//
+//    	    WiFi_ReadData(linkID, (uint8_t*) dataBuff, dataRecLen, 1000);
+//        	result = f_write(&file, dataBuff, dataRecLen, &bw);
+//        	if(FR_OK != result)
+//        	{
+//        		f_close(&file);
+//        		return 3;
+//        	}
+//
+//        	msgSize -= dataRecLen;
+//
+//    	}
+//
+//    	f_close(&file);
+//
+//    }
+//    else
+//    {
+//    	return 3;
+//    }
+//
+//    WiFi_CloseConnection(linkID);
+//    return 0;
+//}
+
+static uint8_t forecastRequest2(SForecastConfig* forecastConfig)
 {
     char dataBuff[2048];
-    char requestPath[150];
+    char requestPath[320];
 	int8_t linkID;
     char* msgPayload;
     int16_t msgSize = 0;
@@ -147,15 +267,30 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
     UINT bw;
     FIL file;
 
-    sprintf(requestPath, "/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,alerts,daily&units=metric&appid=%s",
-    		forecastConfig->lat, forecastConfig->lon, forecastConfig->apiKey);
+    char startDateStr[12];
+    char endDateStr[12];
+    time_t time = RTC_getTime();
+    struct tm * t = gmtime(&time);
 
-    HTTP_createRequestHeader(dataBuff, 2048, HTTP_GET, requestPath, 0);
-    msgSize = HTTP_addHeaderField(dataBuff, 2048, "Host","api.openweathermap.org");
-    Logger(LOG_DBG, "fcast request: %d", msgSize);
+    sprintf(startDateStr, "%d-%02d-%02d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
+    time += (2*24*60*60); //add 2 days
+    gmtime(&time);
+    sprintf(endDateStr, "%d-%02d-%02d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
+
+    sprintf(requestPath,
+    		"/v1/forecast?latitude=%s&longitude=%s"
+    		"&hourly=temperature_2m,apparent_temperature,rain,showers,snowfall,"
+    		"weathercode,pressure_msl,windspeed_10m,windgusts_10m"
+    		"&timeformat=unixtime&timezone=auto&start_date=%s&end_date=%s",
+    		forecastConfig->lat, forecastConfig->lon,
+			startDateStr, endDateStr);
+
+    HTTP_createRequestHeaderVer(dataBuff, 2048, HTTP_GET, requestPath, 0, HTTP_1_0);
+    msgSize = HTTP_addHeaderField(dataBuff, 2048, "Host","api.open-meteo.com");
+    Logger(LOG_DBG, "fcast 2 request: %d", msgSize);
 
 
-    linkID = WiFi_OpenTCPConnection("api.openweathermap.org", 80, 0);
+    linkID = WiFi_OpenTCPConnection("api.open-meteo.com", 80, 0);
     if(linkID < 0)
     {
     	return 1;
@@ -164,31 +299,37 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
     //request send
     WiFi_SendData(linkID, (uint8_t*) dataBuff, msgSize);
 
-    //first package receive
-    system_sleep(250);
+    //first part receive
+    system_sleep(100);
     WiFi_UpdateStatus(1000);
-    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0)	//TODO add timeout
+    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0 && wifiStatus.linksStatus[linkID].connected)
     {
-    	system_sleep(250);
+    	system_sleep(100);
     	WiFi_UpdateStatus(1000);
     }
 
     dataRecLen = wifiStatus.linksStatus[linkID].dataWaiting;
-    if(dataRecLen > 2048) dataRecLen = 2048;
+    if(dataRecLen <= 0)
+    {
+    	Logger(LOG_ERR, "No data received");
+    	return 1;
+    }
+    else if(dataRecLen > 2048)
+    {
+    	dataRecLen = 2048;
+    }
     WiFi_ReadData(linkID, (uint8_t*) dataBuff, dataRecLen, 1000);
 
     if(HTTP_getResponseCode(dataBuff, dataRecLen) != 200)
     {
-    	Logger(LOG_WRN, "Forecast response code: %d", HTTP_getResponseCode(dataBuff, dataRecLen));
+    	Logger(LOG_ERR, "Forecast response code: %d", HTTP_getResponseCode(dataBuff, dataRecLen));
     	return 2;
     }
 
-    msgSize = HTTP_getContentSize(dataBuff, dataRecLen);
+    msgSize = 0;
     msgPayload = HTTP_getContent(dataBuff, dataRecLen);
 
-    Logger(LOG_DBG, "Forecast size: %d", msgSize);
-
-    if(FR_OK == f_open(&file, FILE_PATH_FCAST_TMP, FA_OPEN_ALWAYS | FA_WRITE))
+    if(FR_OK == f_open(&file, FILE_PATH_FCAST_TMP"2", FA_OPEN_ALWAYS | FA_WRITE))
     {
     	FRESULT result;
     	result = f_write(&file, msgPayload, dataRecLen - (msgPayload-dataBuff), &bw);
@@ -199,16 +340,23 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
     		return 3;
     	}
 
-    	msgSize -= (dataRecLen - (msgPayload-dataBuff));
-    	while(msgSize > 0)
+    	msgSize += (dataRecLen - (msgPayload-dataBuff));
+
+    	while(1)
     	{
     		WiFi_UpdateStatus(1000);
-    	    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0) 	//TODO add timeout
+    	    while(wifiStatus.linksStatus[linkID].dataWaiting <= 0 && wifiStatus.linksStatus[linkID].connected)
     	    {
-    	    	system_sleep(250);
+    	    	system_sleep(100);
     	    	WiFi_UpdateStatus(1000);
     	    }
+
     	    dataRecLen = wifiStatus.linksStatus[linkID].dataWaiting;
+    	    if(dataRecLen <= 0)
+    	    {
+    	    	break;
+    	    }
+
     	    if(dataRecLen > 2048) dataRecLen = 2048;
 
     	    WiFi_ReadData(linkID, (uint8_t*) dataBuff, dataRecLen, 1000);
@@ -219,10 +367,10 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
         		return 3;
         	}
 
-        	msgSize -= dataRecLen;
+        	msgSize += dataRecLen;
 
     	}
-
+    	Logger(LOG_DBG, "Forecast size: %d", msgSize);
     	f_close(&file);
 
     }
@@ -234,7 +382,6 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
     WiFi_CloseConnection(linkID);
     return 0;
 }
-
 
 /**
  * Get location coordinate from zip code

@@ -275,14 +275,19 @@ int16_t HTTP_createResponseHeader(char* headerPtr, uint16_t buff_size, uint16_t 
 
 int16_t HTTP_createRequestHeader(char* headerPtr, uint16_t buff_size, HTTP_METHOD method, char* path, uint32_t payloadSize)
 {
+	return HTTP_createRequestHeaderVer(headerPtr, buff_size, method, path, payloadSize, HTTP_1_1);
+}
+
+int16_t HTTP_createRequestHeaderVer(char* headerPtr, uint16_t buff_size, HTTP_METHOD method, char* path, uint32_t payloadSize, HTTP_VERSION version)
+{
 	uint16_t size = 0;
 	switch (method)
 	{
 		case HTTP_GET:
-			size += snprintf(headerPtr, buff_size, "GET %s HTTP/1.1\r\n\r\n", path);
+			size += snprintf(headerPtr, buff_size, "GET %s HTTP/1.%d\r\n\r\n", path, version);
 			break;
 		case HTTP_POST:
-			size += snprintf(headerPtr, buff_size, "POST %s HTTP/1.1\r\nContent-Length: %ld\r\n\r\n", path, payloadSize);
+			size += snprintf(headerPtr, buff_size, "POST %s HTTP/1.%d\r\nContent-Length: %ld\r\n\r\n", path, version, payloadSize);
 			break;
 		default:
 			return -1;

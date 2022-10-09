@@ -225,14 +225,7 @@ int main(void)
 	  system_shutdown();
   }
 
-  //test
-//  HAL_Delay(250);
-//  Logger(LOG_INF, "Test set timer");
-//  system_setWakeUpTimer(20); //20 seconds
-//  system_shutdown();
-
   //WiFi restart procedure
-#if 1
   while(1)
   {
 	  if(WIFI_RESP_OK == WiFi_restart(5000))
@@ -253,6 +246,7 @@ int main(void)
 		  Logger(LOG_ERR, "WiFi restart failed %d times", retryCounter);
 		  if(retryCounter > 5)
 		  {
+			  WiFi_shutdown();
 			  show_error_image(ERR_IMG_GENERAL, "WIFI error");
 			  for(uint8_t i = 0; i < 40; i++)
 			  {
@@ -269,7 +263,6 @@ int main(void)
   Logger(LOG_INF, "Set SNTP config");
   WiFi_setSNTPconfig(1, 0, 1000);
   system_sleep(1000);
-#endif
 
   //start applications
   if(system_isConfigModeOn())

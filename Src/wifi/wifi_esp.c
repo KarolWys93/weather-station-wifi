@@ -874,57 +874,6 @@ Wifi_RespStatus WiFi_GetVersionString(char* versionStringPtr, uint16_t size, uin
 
 }
 
-//Wifi_RespStatus WiFi_GetVersionString(char* versionStringPtr, uint16_t size, uint32_t timeout)
-//{
-//	uint32_t startTime = HAL_GetTick();
-//	Wifi_RespStatus status = WIFI_RESP_TIMEOUT;
-//	char* message = NULL;
-//
-//	if(HAL_OK != UART_TransmitLine(&WiFiUart, "AT+GMR", 100))
-//	{
-//		return WIFI_RESP_ERROR;
-//	}
-//
-//	WiFi_MessageReceivingStart(true);
-//	do
-//	{
-//		if(messageReceived())
-//		{
-//			message = getMessage();
-//			if(0 == strncmp(message, "Bin version", 11))
-//			{
-//				message += 11;
-//				while(*message != ':')
-//				{
-//					if(*message == '\0')
-//					{
-//						return WIFI_RESP_ERROR;
-//					}
-//					message++;
-//				}
-//				message++;
-//				strncpy(versionStringPtr, message, size);
-//				*(versionStringPtr+size-1) = '\0';
-//				status = WIFI_RESP_OK;
-//				break;
-//			}
-//			if(0 == strcmp(message, "OK"))
-//			{
-//				status = WIFI_RESP_ERROR;
-//				break;
-//			}
-//		}
-//		else
-//		{
-//			HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
-//		}
-//	}
-//	while(startTime + timeout > HAL_GetTick());
-//
-//	return status;
-//
-//}
-
 Wifi_RespStatus WiFi_DisconnectStation(uint32_t timeout)
 {
 	return sendInstruction("AT+CWQAP", timeout);

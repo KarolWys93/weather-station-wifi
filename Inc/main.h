@@ -67,6 +67,8 @@ void Error_Handler(void);
 #define D_BUSY_GPIO_Port GPIOC
 #define D_DC_Pin GPIO_PIN_1
 #define D_DC_GPIO_Port GPIOC
+#define SYS_WKUP_Pin GPIO_PIN_0
+#define SYS_WKUP_GPIO_Port GPIOA
 #define BAT_ADC_Pin GPIO_PIN_1
 #define BAT_ADC_GPIO_Port GPIOA
 #define BAT_ADC_GND_Pin GPIO_PIN_4

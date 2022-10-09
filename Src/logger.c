@@ -77,8 +77,6 @@ uint8_t Logger_init(void)
 	Logger(LOG_VIP, "=-=-=-=-=-=");
 	Logger(LOG_INF, "Logger started");
 
-	Logger(LOG_ERR, "2022 05 03 16:44:08 DBG Debug: Paint_DrawLine Input exceeds the normal display rangedisplay rangedisplay rangedisplay range potato");
-
 	return result;
 }
 
