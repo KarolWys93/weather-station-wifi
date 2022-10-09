@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <time.h>
 
-//#define FORECAST_SIZE 48
 #define FORECAST_SIZE 72
 
 typedef enum EWeaterCondition
@@ -47,6 +46,5 @@ typedef struct SForecast
 
 
 uint8_t parseForecast(char * jsonFileName, SForecast *forecastData);
-uint8_t parseForecast2(char * jsonFileName, SForecast *forecastData);
 
 #endif /* APP_CLIENT_FORECAST_H_ */

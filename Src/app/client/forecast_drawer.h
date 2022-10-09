@@ -11,6 +11,5 @@
 #include "forecast.h"
 
 void drawForecast(const SForecast * const forecastData);
-void drawForecast2(const SForecast * const forecastData);
 
 #endif /* APP_CLIENT_FORECAST_DRAWER_H_ */
