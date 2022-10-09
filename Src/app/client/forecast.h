@@ -11,17 +11,17 @@
 #include <stdint.h>
 #include <time.h>
 
-#define FORECAST_SIZE 48
+#define FORECAST_SIZE 72
 
 typedef enum EWeaterCondition
 {
-	WEATER_STORM,
-	WEATER_DRIZZLE,
-	WEATER_RAIN,
-	WEATER_SNOW,
-	WEATER_ATMOSPHERE,
-	WEATER_CLEAR,
-	WEATER_CLOUDS
+	WEATHER_STORM,
+	WEATHER_DRIZZLE,
+	WEATHER_RAIN,
+	WEATHER_SNOW,
+	WEATHER_ATMOSPHERE,
+	WEATHER_CLEAR,
+	WEATHER_CLOUDS
 } EWeaterCondition;
 
 typedef struct SForecastHour
@@ -40,12 +40,11 @@ typedef struct SForecastHour
 
 typedef struct SForecast
 {
-	time_t timeOffset;
+	time_t timeZoneOffset;
 	SForecastHour hourForecast[FORECAST_SIZE];
 } SForecast;
 
 
 uint8_t parseForecast(char * jsonFileName, SForecast *forecastData);
-
 
 #endif /* APP_CLIENT_FORECAST_H_ */

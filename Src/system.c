@@ -62,7 +62,7 @@ static volatile uint8_t bat_adc_is_runing = 0;
 //private functions
 static void shutdownSystem(void);
 static void cardMountFailed(void);
-static void startBatteryMeasurment(void);
+static void startBatteryMeasurement(void);
 static uint32_t filterVoltageValue(uint32_t voltage);
 
 
@@ -109,8 +109,25 @@ void system_init(void)
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 	}
 
+	//wait for release wakeup button
+	bool isPressed = true;
+	while(isPressed)
+	{
+		system_sleep(100);
+		if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+		{
+			system_sleep(100);
+			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+			{
+				isPressed = false;
+				__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+			}
+		}
+	}
+
+	/* Start battery voltage measurement*/
 	HAL_ADCEx_Calibration_Start(&hadc1);
-	startBatteryMeasurment();
+	startBatteryMeasurement();
 
 	/* Mount SD Card */
 	if(FR_OK != f_mount(&fs, "", 1))
@@ -119,6 +136,7 @@ void system_init(void)
 	}
 	system_sleep(100);
 
+	/* Logger init */
 	Logger_init();
 	Logger(LOG_VIP, "Reset cause: %d", systemConfig.resetSrc);
 	Logger(LOG_VIP, "Version: %s", VERSION_STR);
@@ -129,7 +147,7 @@ void system_init(void)
 	Logger_setMinLevel(LOG_DBG);
 	#endif
 
-	//read configs
+	/* Read configs */
 	if(FR_OK == f_stat(FILE_PATH_LED_IND_FLAG, NULL))
 	{
 		systemConfig.ledIndON = 1;
@@ -157,16 +175,18 @@ void system_init(void)
 
 	Logger(LOG_INF, "Config mode %d", systemConfig.configMode);
 
+	/* Display init */
 	if(EPD_Init())
 	{
 		Logger(LOG_ERR, "e-Paper init failed");
 	}
 
-	if(systemConfig.wakeUpCounter % 5 == 0)
+	if(systemConfig.configMode || systemConfig.wakeUpCounter % 5 == 0)
 	{
 		Logger(LOG_INF, "clear disp");
 		EPD_Clear();
 	}
+
 	Logger(LOG_INF, "system init OK (%d)", systemConfig.wakeUpCounter);
 }
 
@@ -232,7 +252,7 @@ uint32_t system_batteryVoltage(void)
 {
 	if(!bat_adc_is_runing)
 	{
-		startBatteryMeasurment();
+		startBatteryMeasurement();
 	}
 	return batteryVoltage;
 }
@@ -275,7 +295,7 @@ void system_sleep(uint32_t miliseconds)
   /* Add a freq to guarantee minimum wait */
   if (wait < HAL_MAX_DELAY)
   {
-    wait += (uint32_t)(uwTickFreq);
+	  wait += (uint32_t)(uwTickFreq);
   }
 
   while ((HAL_GetTick() - tickstart) < wait)
@@ -349,6 +369,7 @@ static void shutdownSystem(void)
 	Logger(LOG_INF, "System shutdown");
 	EPD_Sleep();
 	WiFi_DisconnectStation(1000);
+	WiFi_shutdown();
 
 	Logger(LOG_INF, "Run time: %d ms", HAL_GetTick()-startTimestamp);
 	Logger_shutdown();
@@ -363,7 +384,7 @@ static void cardMountFailed(void)
 	HAL_PWR_EnterSTANDBYMode();
 }
 
-static void startBatteryMeasurment(void)
+static void startBatteryMeasurement(void)
 {
 	if(!system_isCharging())
 	{
@@ -403,7 +424,7 @@ static uint32_t filterVoltageValue(uint32_t voltage)
 	}
 }
 
-//battery voltage measurment callback
+//battery voltage measurement callback
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	// R1 = 10 kOhm, R2 = 33 kOhm

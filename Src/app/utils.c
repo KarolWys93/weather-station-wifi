@@ -11,8 +11,6 @@
 #include "rtc.h"
 #include "system.h"
 
-#define OLD_TIME_STAMP 946681200	//00:00:00 01-01-2000
-
 
 bool timeSync(uint8_t retries)
 {

@@ -10,6 +10,12 @@
 
 #include <stdint.h>
 
+typedef enum HTTP_VERSION
+{
+	HTTP_1_0 = 0,
+	HTTP_1_1 = 1
+} HTTP_VERSION;
+
 typedef enum HTTP_METHOD
 {
 	HTTP_GET = 0,
@@ -27,5 +33,6 @@ int16_t HTTP_getResponseCode(char* buffer, uint16_t buffer_size);
 int16_t HTTP_addHeaderField(char* headerPtr, uint16_t buff_size, char* fieldName, char*fieldValue);
 int16_t HTTP_createResponseHeader(char* headerPtr, uint16_t buff_size, uint16_t responseCode, uint32_t payloadSize);
 int16_t HTTP_createRequestHeader(char* headerPtr, uint16_t buff_size, HTTP_METHOD method, char* path, uint32_t payloadSize);
+int16_t HTTP_createRequestHeaderVer(char* headerPtr, uint16_t buff_size, HTTP_METHOD method, char* path, uint32_t payloadSize, HTTP_VERSION version);
 
 #endif /* HTTP_REQUESTS_H_ */

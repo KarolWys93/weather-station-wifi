@@ -28,4 +28,6 @@
 #define FILE_PATH_LED_IND_FLAG		DIR_PATH_SYS"/led_ind"
 #define FILE_PATH_CONFIG_MODE_FLAG  DIR_PATH_SYS"/conf_mode"
 
+#define FILE_PATH_FCAST_TMP         "/forecast.tmp"
+
 #endif /* SYSTEM_INFO_H_ */
