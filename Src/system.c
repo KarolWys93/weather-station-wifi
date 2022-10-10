@@ -147,6 +147,9 @@ void system_init(void)
 	Logger_setMinLevel(LOG_DBG);
 	#endif
 
+	/* Check if config & system directories exist */
+	//TODO check and restore if they don't exist and reset in config mode
+
 	/* Read configs */
 	if(FR_OK == f_stat(FILE_PATH_LED_IND_FLAG, NULL))
 	{
@@ -313,7 +316,7 @@ uint8_t system_restoreDefault(void)
 
 	//create directories
 	f_mkdir(DIR_PATH_SYS);
-	f_mkdir(DIR_PATH_SYS);
+	f_mkdir(DIR_PATH_CONF);
 
 	//WiFi config
 	f_unlink(FILE_PATH_WIFI_CONFIG);

@@ -21,29 +21,34 @@
 			<div class="col-8">
 				<h1>Forecast configuration</h1>
 				<div class="col-md-12">
-				<p>The weather station uses the <strong>OpenWeather</strong> API to fetch the current forecast.
+				<p>Forecasts are provided thanks to <strong><a href=https://open-meteo.com/>open-meteo</a></strong>! Here you can configure the location for which you want to receive forecasts.
+				The location can be given by coordinates or by a postal code.</p>
+				<p>If you want to enter a location using a zip code, you need to get an API key for a <strong>OpenWeather</strong> geocoding service. 
 				The API key can be created after logging in to <a href=https://openweathermap.org/>openweathermap.org</a>.
-				The free plan should suit the needs of your weather station.</br>
-				The forecast is provided for your location. The location can be specified using a zip code or coordinates.</p>
+				The free plan includes the geocoding service.</p>
 				</div>
 				<div id="alert_container" style="display: none;"></div>
 				<form><fieldset class="row g-3" disabled>
-					<div class="col-10">
-						<label for="api_key" class="form-label">API key</label>
+					<div class="col-6">
+						<label for="api_key" class="form-label">Geocoding API key</label>
 						<input type="text" class="form-control" id="api_key" name="api_key" maxlength="32" placeholder="key" required>
 						<small id="passHelpBlock" class="form-text text-muted">
 							The API key should be 32 characters long.
 						</small>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-6">
 						<label for="refresh" class="form-label text-nowrap">Refresh period</label>
 						<select class="form-select" id="refresh" name="refresh">
 								<option value="1" selected>1h</option>
 								<option value="2">2h</option>
 								<option value="4">4h</option>
+								<option value="6">6h</option>
 								<option value="8">8h</option>
 								<option value="12">12h</option>
 						</select>
+						<small id="passHelpBlock" class="form-text text-muted">
+							Longer period improves battery life.
+						</small>
 					</div>
 					<div class="col-md-12">
 						<label for="by_zip_code" class="form-label">Location by zip code</label>
@@ -366,12 +371,25 @@
 					tmpData[this.name] = this.value;
 				});
 				
-				jsonData["api_key"] = tmpData.api_key;
 				jsonData["refresh"] = parseInt(tmpData.refresh);
+
+				if(tmpData.api_key.length > 0)
+				{
+					if(tmpData.api_key.length != 32){
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> Invalid API key. The API key should be 32 characters long.</div>').fadeIn();
+						return;
+					}else{
+						jsonData["api_key"] = tmpData.api_key;
+					}
+				}
 				
 				if(tmpData.location_mode === 'zip_code'){
 					jsonData["country"] = tmpData.country;
 					jsonData["zip_code"] = tmpData.zip_code;
+					if(!("api_key" in jsonData)){
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> The API key is required when using the location by zip code</div>').fadeIn();
+						return;
+					}
 				}else{
 					if(!ValidateCoordinates(tmpData.lat) || parseInt(tmpData.lat) > 179 || parseInt(tmpData.lat) < -179)
 					{
@@ -386,12 +404,7 @@
 					jsonData["lon"] = tmpData.lon;
 					jsonData["lat"] = tmpData.lat;
 				}
-				
-				if(jsonData["api_key"].length != 32)
-				{
-					$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> Invalid API key. The API key should be 32 characters long.</div>').fadeIn();
-					return;
-				}
+
 				if('zip_code' in jsonData && jsonData["zip_code"].length === 0)
 				{
 					$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> ZIP code cannot be empty.</div>').fadeIn();

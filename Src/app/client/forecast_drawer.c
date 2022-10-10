@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "system.h"
+#include "logger.h"
 
 #define DISPLAY_DATA_SIZE 42
 
@@ -273,7 +274,7 @@ void drawForecast(const SForecast * const forecastData)
 	}
 
 	//wind
-	for(uint8_t i = 0; i < 43; i++)
+	for(uint8_t i = 0; i < DISPLAY_DATA_SIZE; i++)
 	{
 		uint16_t windG = forecastData->hourForecast[timeOffset + i].wind_gust;
 		uint16_t wind = forecastData->hourForecast[timeOffset + i].wind;
@@ -316,9 +317,9 @@ static void getRangeValues(SRangesValues *rangeValues, const SForecast * const f
 	if(offset > FORECAST_SIZE - DISPLAY_DATA_SIZE+1)
 		return;
 
-	for(uint8_t i = offset; i < DISPLAY_DATA_SIZE+1; i++)
+	for(uint8_t i = 0; i < DISPLAY_DATA_SIZE+1; i++)
 	{
-		SForecastHour hourF = forecastData->hourForecast[i];
+		SForecastHour hourF = forecastData->hourForecast[i + offset];
 
 		if(hourF.temp > rangeValues->maxTemp) rangeValues->maxTemp = hourF.temp;
 		if(hourF.temp < rangeValues->minTemp) rangeValues->minTemp = hourF.temp;
@@ -336,4 +337,10 @@ static void getRangeValues(SRangesValues *rangeValues, const SForecast * const f
 		if(hourF.wind_gust > rangeValues->maxGWind) rangeValues->maxGWind = hourF.wind_gust;
 
 	}
+
+	Logger(LOG_DBG, "Range temp [%d:%d]", rangeValues->minTemp, rangeValues->maxTemp);
+	Logger(LOG_DBG, "Range temp_feel [%d:%d]", rangeValues->minFtemp, rangeValues->maxFtemp);
+	Logger(LOG_DBG, "Range rain/snow [%d:%d]", rangeValues->maxRain, rangeValues->maxSnow);
+	Logger(LOG_DBG, "Range pressure [%d:%d]", rangeValues->minPressure, rangeValues->maxPressure);
+	Logger(LOG_DBG, "Range wind/gust [%d:%d]", rangeValues->maxWind, rangeValues->maxGWind);
 }

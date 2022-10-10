@@ -669,6 +669,8 @@ HTTP_STATUS serverAPI_setForecastConfig(char* request, uint32_t reqSize)
 	uint16_t tokenSize;
 	jsmntok_t* tokenPtr;
 
+	bool keyIsPresent = false;
+
 	requestBodySize = HTTP_getContentSize(request, reqSize);
 	requestBodyPtr = HTTP_getContent(request, reqSize);
 	if(requestBodyPtr == NULL || ((requestBodyPtr - request + requestBodySize) != reqSize)) return HTTP_SERVER_BAD_REQUEST;
@@ -680,21 +682,24 @@ HTTP_STATUS serverAPI_setForecastConfig(char* request, uint32_t reqSize)
 		return HTTP_SERVER_BAD_REQUEST;
 	}
 
-	tokenPtr = jsmn_get_token("api_key", requestBodyPtr, jsonTokens, numOfTokens);
-	if(tokenPtr == NULL){return HTTP_SERVER_BAD_REQUEST;}
-	tokenSize = tokenPtr->end - tokenPtr->start;
-	if(tokenSize != 32){return HTTP_SERVER_BAD_REQUEST;}
-	configJsonPtr += sprintf(configJsonPtr, "{\"api_key\":\"%.*s\",", tokenSize, requestBodyPtr+tokenPtr->start);
-
-
 	tokenPtr = jsmn_get_token("refresh", requestBodyPtr, jsonTokens, numOfTokens);
 	if(tokenPtr == NULL){return HTTP_SERVER_BAD_REQUEST;}
 	tokenSize = tokenPtr->end - tokenPtr->start;
-	configJsonPtr += sprintf(configJsonPtr, "\"refresh\":%d,", atoi(requestBodyPtr+tokenPtr->start));
+	configJsonPtr += sprintf(configJsonPtr, "{\"refresh\":%d,", atoi(requestBodyPtr+tokenPtr->start));
 
+	tokenPtr = jsmn_get_token("api_key", requestBodyPtr, jsonTokens, numOfTokens);
+	if(tokenPtr != NULL){
+		tokenSize = tokenPtr->end - tokenPtr->start;
+		if(tokenSize != 32){return HTTP_SERVER_BAD_REQUEST;}
+		configJsonPtr += sprintf(configJsonPtr, "\"api_key\":\"%.*s\",", tokenSize, requestBodyPtr+tokenPtr->start);
+		keyIsPresent = true;
+	}
 
 	if(NULL != (tokenPtr = jsmn_get_token("country", requestBodyPtr, jsonTokens, numOfTokens)))
 	{
+		//If we use geocoding, then the API key is needed
+		if(!keyIsPresent){return HTTP_SERVER_BAD_REQUEST;}
+
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize != 2){return HTTP_SERVER_BAD_REQUEST;}
 		configJsonPtr += sprintf(configJsonPtr, "\"country\":\"%.*s\",", 2, requestBodyPtr+tokenPtr->start);
@@ -705,6 +710,7 @@ HTTP_STATUS serverAPI_setForecastConfig(char* request, uint32_t reqSize)
 		if(tokenSize > 11){return HTTP_SERVER_BAD_REQUEST;}
 		configJsonPtr += sprintf(configJsonPtr, "\"zip_code\":\"%.*s\"}", tokenSize, requestBodyPtr+tokenPtr->start);
 	}
+
 	else if(NULL != (tokenPtr = jsmn_get_token("lon", requestBodyPtr, jsonTokens, numOfTokens)))
 	{
 		tokenSize = tokenPtr->end - tokenPtr->start;
