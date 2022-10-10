@@ -171,7 +171,7 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
 
     HTTP_createRequestHeaderVer(dataBuff, 2048, HTTP_GET, requestPath, 0, HTTP_1_0);
     msgSize = HTTP_addHeaderField(dataBuff, 2048, "Host","api.open-meteo.com");
-    Logger(LOG_DBG, "fcast 2 request: %d", msgSize);
+    Logger(LOG_DBG, "fcast request: %d", msgSize);
 
 
     linkID = WiFi_OpenTCPConnection("api.open-meteo.com", 80, 0);
@@ -254,7 +254,7 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
         	msgSize += dataRecLen;
 
     	}
-    	Logger(LOG_DBG, "Forecast size: %d", msgSize);
+    	Logger(LOG_INF, "Forecast size: %d", msgSize);
     	f_close(&file);
 
     }
@@ -393,14 +393,6 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 		return 2;
 	}
 
-	//api key
-	tokenPtr = jsmn_get_token("api_key", configJsonStr, jsonTokens, numOfTokens);
-	if(tokenPtr == NULL){return 2;}
-	tokenSize = tokenPtr->end - tokenPtr->start;
-	if(tokenSize != 32){return 2;}
-	memcpy(forecastConfig->apiKey, configJsonStr + tokenPtr->start, tokenSize);
-	forecastConfig->apiKey[tokenSize] = '\0';
-
 	//update period
 	tokenPtr = jsmn_get_token("refresh", configJsonStr, jsonTokens, numOfTokens);
 	if(tokenPtr == NULL){return 2;}
@@ -427,6 +419,14 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 	}
 	else
 	{
+		//api key
+		tokenPtr = jsmn_get_token("api_key", configJsonStr, jsonTokens, numOfTokens);
+		if(tokenPtr == NULL){return 2;}
+		tokenSize = tokenPtr->end - tokenPtr->start;
+		if(tokenSize != 32){return 2;}
+		memcpy(forecastConfig->apiKey, configJsonStr + tokenPtr->start, tokenSize);
+		forecastConfig->apiKey[tokenSize] = '\0';
+
 		//zip code
 		tokenPtr = jsmn_get_token("zip_code", configJsonStr, jsonTokens, numOfTokens);
 		if(tokenPtr == NULL){return 2;}
