@@ -10,6 +10,9 @@
 
 #include <stdint.h>
 
+// shut down the server after x minutes of inactivity.
+#define HTTP_SERVER_INACTIVITY_TIMEOUT (10*60*1000)	//10 minutes
+
 #define HTTP_SERVER_REQUEST_SIZE      1000
 #define HTTP_SERVER_RESPONSE_SIZE     2048
 #define HTTP_SERVER_REQUEST_PATH_MAX_SIZE (64)

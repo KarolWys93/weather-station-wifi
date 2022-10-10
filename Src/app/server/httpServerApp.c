@@ -429,6 +429,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 	g_linkID = 0;
 	uint32_t secondCounter = 0;
 	uint32_t tickTime = 0;
+	uint32_t lastActivityTick = 0;
 	int8_t status = 0;
 	bool timeIsSynced = false;
 
@@ -446,6 +447,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 		}
 	}
 
+	lastActivityTick = HAL_GetTick();
 	g_serverRun = true;
 	while(g_serverRun)
 	{
@@ -464,8 +466,8 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 				timeIsSynced = timeSync(0);
 			}
 
-			//every 5 second
-			if(secondCounter % 5 == 0)
+			//every 10 second
+			if(secondCounter % 10 == 0)
 			{
 				//power check
 				if(system_batteryLevel() == 0 && !system_isCharging())
@@ -484,7 +486,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 			Logger(LOG_INF, "Link %d received %d bytes", g_linkID, rcvLen);
 			if(rcvLen > 0)
 			{
-				HTTP_STATUS reqStatus =  handleRequest(requestBuffer, rcvLen);
+				HTTP_STATUS reqStatus = handleRequest(requestBuffer, rcvLen);
 				Logger(LOG_INF, "Link %d reqStatus: %d", g_linkID, reqStatus);
 
 				if(HTTP_SERVER_OK != reqStatus)
@@ -492,6 +494,9 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 					status = 3;
 					break;
 				}
+
+				lastActivityTick = HAL_GetTick();
+
 			}
 //			if(linkStatus->connected)
 //			{
@@ -500,6 +505,12 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 		}
 
 		g_linkID = (g_linkID+1)%5;
+
+		if(HAL_GetTick() - lastActivityTick > HTTP_SERVER_INACTIVITY_TIMEOUT)
+		{
+			Logger(LOG_INF, "Server shutdown due to inactivity");
+			system_restart(0);
+		}
 
 		HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
 	}
