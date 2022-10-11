@@ -148,7 +148,13 @@ void system_init(void)
 	#endif
 
 	/* Check if config & system directories exist */
-	//TODO check and restore if they don't exist and reset in config mode
+	if(FR_NO_FILE == f_stat(DIR_PATH_SYS, NULL) || FR_NO_FILE == f_stat(DIR_PATH_CONF, NULL))
+	{
+		Logger(LOG_VIP, "Required directories not found! Restoring...");
+		system_restoreDefault();
+		system_restart(1);
+	}
+
 
 	/* Read configs */
 	if(FR_OK == f_stat(FILE_PATH_LED_IND_FLAG, NULL))
@@ -201,7 +207,7 @@ void system_shutdown(void)
 
 void system_restart(uint8_t configMode)
 {
-	Logger(LOG_INF, "Prepare for restart in %s mode", configMode ? "normal" : "config");
+	Logger(LOG_INF, "Prepare for restart in %s mode", configMode ? "config" : "normal");
 	if(configMode)
 	{
 		FIL file;

@@ -79,6 +79,7 @@ const unsigned char lut_red1[] = {
     0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+static uint8_t isReady = 0;
 
 /******************************************************************************
 function :	Software reset
@@ -126,6 +127,7 @@ parameter:
 ******************************************************************************/
 static void EPD_WaitUntilIdle(void)
 {
+    if(!isReady) return;
     Debug("e-Paper busy");
     while(1) {      //LOW: busy, HIGH: idle
         if(DEV_Digital_Read(EPD_BUSY_PIN) == 1)
@@ -193,7 +195,7 @@ parameter:
 UBYTE EPD_Init(void)
 {
     EPD_Reset();
-
+    isReady = 1;
     EPD_SendCommand(POWER_SETTING);
     EPD_SendData(0x07);
     EPD_SendData(0x00);
@@ -418,4 +420,5 @@ void EPD_Sleep(void)
     EPD_SendData(0x00);
     EPD_WaitUntilIdle();
     EPD_SendCommand(POWER_OFF);         //power off
+    isReady = 0;
 }
