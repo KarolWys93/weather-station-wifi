@@ -92,6 +92,7 @@ void system_init(void)
 			systemConfig.resetSrc = SYSTEM_ALARM_RST;
 		}
 
+		//TODO this returns strange results
 		toEarly = RTC_getTime() - RTC_getAlarmTime();
 		if(toEarly < 0) toEarly = 0;
 	}
@@ -138,10 +139,11 @@ void system_init(void)
 
 	/* Logger init */
 	Logger_init();
-	Logger(LOG_VIP, "Reset cause: %d", systemConfig.resetSrc);
+	Logger(LOG_VIP, "SN: %08X%08X%08X", HAL_GetUIDw2(), HAL_GetUIDw1(), HAL_GetUIDw0());
 	Logger(LOG_VIP, "Version: %s", VERSION_STR);
 
-	Logger(LOG_VIP, "toEarly: %d", toEarly);
+	Logger(LOG_VIP, "Reset cause: %d", systemConfig.resetSrc);
+	Logger(LOG_VIP, "toEarly: %u", toEarly);
 
 	#ifdef DEBUG
 	Logger_setMinLevel(LOG_DBG);
@@ -348,7 +350,7 @@ uint8_t system_restoreDefault(void)
 	{
 		if(FR_OK == f_open(&file, FILE_PATH_HOSTNAME, FA_OPEN_ALWAYS | FA_WRITE))
 		{
-			f_printf(&file, "WeatherStation_%04X", (int)HAL_GetDEVID());
+			f_printf(&file, "WeatherStation_%04X", (uint16_t)HAL_GetUIDw0());
 			f_close(&file);
 		}
 		else
@@ -362,7 +364,7 @@ uint8_t system_restoreDefault(void)
 	{
 		if(FR_OK == f_open(&file, FILE_PATH_AP_CONFIG, FA_OPEN_ALWAYS | FA_WRITE))
 		{
-			f_printf(&file, "{\"ssid\":\"WeatherStation_%04X\",\"enc\":3,\"channel\":8,\"pass\":\"littlefox123\"}", (int)HAL_GetDEVID());
+			f_printf(&file, "{\"ssid\":\"WeatherStation_%04X\",\"enc\":3,\"channel\":8,\"pass\":\"littlefox123\"}", (uint16_t)HAL_GetUIDw0());
 			f_close(&file);
 		}
 		else
@@ -380,7 +382,7 @@ static void shutdownSystem(void)
 	WiFi_DisconnectStation(1000);
 	WiFi_shutdown();
 
-	Logger(LOG_INF, "Run time: %d ms", HAL_GetTick()-startTimestamp);
+	Logger(LOG_INF, "Run time: %u ms", HAL_GetTick()-startTimestamp);
 	Logger_shutdown();
 }
 
