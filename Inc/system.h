@@ -20,8 +20,6 @@ void system_restart(uint8_t configMode);
 
 void system_setWakeUpTimer(uint32_t seconds);
 
-extern volatile uint8_t system_rtc_alarm_on;
-
 char* const system_getHostName(void);
 uint8_t system_isLedIndicatorOn(void);
 uint8_t system_isConfigModeOn(void);

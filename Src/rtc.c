@@ -41,12 +41,6 @@ void MX_RTC_Init(void)
 
   /* USER CODE BEGIN RTC_Init 1 */
 
-  //hack for read flag before RTC init
-  if (READ_BIT(RTC->CRL, RTC_FLAG_ALRAF))
-  {
-	  system_rtc_alarm_on = 1;
-  }
-
   /* USER CODE END RTC_Init 1 */
   /** Initialize RTC Only
   */

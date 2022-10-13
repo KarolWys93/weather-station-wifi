@@ -23,12 +23,14 @@
 #include "images.h"
 
 #define BCKUP_REGISTER_WKUP_CNT 1
+#define BCKUP_REGISTER_LAST_ALARM 2
 
 typedef enum system_rst_src
 {
 	SYSTEM_PWR_RST = 0,
 	SYSTEM_WAKEUP_RST,
-	SYSTEM_ALARM_RST
+	SYSTEM_ALARM_RST,
+	SYSTEM_UNKNOWN_RST
 } system_rst_src;
 
 typedef struct SSystemConfig
@@ -40,8 +42,6 @@ typedef struct SSystemConfig
 	char hostName[33];
 } SSystemConfig;
 
-
-volatile uint8_t system_rtc_alarm_on = 0;
 
 static FATFS fs;
 static SSystemConfig systemConfig;
@@ -69,38 +69,59 @@ static uint32_t filterVoltageValue(uint32_t voltage);
 void system_init(void)
 {
 	FIL file;
-	int32_t toEarly = 0;
+	uint32_t startRTCTime;
 
 	startTimestamp = HAL_GetTick();
+	startRTCTime = (RTC_getTime() & 0xFFFF);
+
+	//wait for release wakeup button
+	bool wkupButtonPressed = false;
+	while(1)
+	{
+		if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+		{
+			system_sleep(100);
+			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+			{
+				break;
+			}
+		}
+		else
+		{
+			wkupButtonPressed = true;
+			system_sleep(100);
+		}
+	}
 
 	memset(&systemConfig, 0, sizeof(SSystemConfig));
 
 	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
 	{
+		uint32_t lastAlarmTime = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_ALARM);
+
 		/* Clear standby flag */
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
 
 		/* Clear wakeup flag */
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
-		systemConfig.wakeUpCounter = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_WKUP_CNT);
-		systemConfig.wakeUpCounter++;
-		systemConfig.resetSrc = SYSTEM_WAKEUP_RST;
-
-		if(RTC_getAlarmTime() <= RTC_getTime())
+		if(wkupButtonPressed)
+		{
+			systemConfig.resetSrc = SYSTEM_WAKEUP_RST;
+		}
+		else if(lastAlarmTime + 1 == startRTCTime)
 		{
 			systemConfig.resetSrc = SYSTEM_ALARM_RST;
 		}
+		else
+		{
+			systemConfig.resetSrc = SYSTEM_UNKNOWN_RST;
+		}
 
-		//TODO this returns strange results
-		toEarly = RTC_getTime() - RTC_getAlarmTime();
-		if(toEarly < 0) toEarly = 0;
+		systemConfig.wakeUpCounter = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_WKUP_CNT);
+
+		systemConfig.wakeUpCounter++;
 	}
-
-//	if(system_rtc_alarm_on)
-//	{
-//		systemConfig.resetSrc = SYSTEM_ALARM_RST;
-//	}
 
 	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_WKUP_CNT, systemConfig.wakeUpCounter);
 
@@ -108,22 +129,6 @@ void system_init(void)
 	{
 		HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-	}
-
-	//wait for release wakeup button
-	bool isPressed = true;
-	while(isPressed)
-	{
-		system_sleep(100);
-		if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
-		{
-			system_sleep(100);
-			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
-			{
-				isPressed = false;
-				__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-			}
-		}
 	}
 
 	/* Start battery voltage measurement*/
@@ -143,7 +148,10 @@ void system_init(void)
 	Logger(LOG_VIP, "Version: %s", VERSION_STR);
 
 	Logger(LOG_VIP, "Reset cause: %d", systemConfig.resetSrc);
-	Logger(LOG_VIP, "toEarly: %u", toEarly);
+	if(SYSTEM_UNKNOWN_RST == systemConfig.resetSrc)
+	{
+		Logger(LOG_WRN, "Unknown reset cause");
+	}
 
 	#ifdef DEBUG
 	Logger_setMinLevel(LOG_DBG);
@@ -156,7 +164,6 @@ void system_init(void)
 		system_restoreDefault();
 		system_restart(1);
 	}
-
 
 	/* Read configs */
 	if(FR_OK == f_stat(FILE_PATH_LED_IND_FLAG, NULL))
@@ -229,6 +236,7 @@ void system_setWakeUpTimer(uint32_t seconds)
 	  timeAlarm += seconds;
 	  Logger(LOG_INF, "Wake-up signal in %d seconds", seconds);
 
+	  HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_ALARM, timeAlarm);
 	  RTC_setAlarmTime(timeAlarm);
 }
 
