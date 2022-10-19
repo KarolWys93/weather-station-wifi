@@ -80,6 +80,7 @@ void runForecastApp(void)
 	//geolocation
 	if(strlen(forecastConf.lat) == 0 || strlen(forecastConf.lon) == 0)
 	{
+		Logger(LOG_INF, "Geocoding request");
 		if(0 != (result = geolocationRequest(&forecastConf)))
 		{
 			Logger(LOG_WRN, "geolocation failed: %d", result);
@@ -95,6 +96,8 @@ void runForecastApp(void)
 			return;
 		}
 	}
+
+	Logger(LOG_INF, "forecast for: %s, %s", forecastConf.lat, forecastConf.lon);
 
 	//get new forecast
     f_unlink(FILE_PATH_FCAST_TMP);

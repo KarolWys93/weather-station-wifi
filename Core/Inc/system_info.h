@@ -8,12 +8,13 @@
 #ifndef SYSTEM_INFO_H_
 #define SYSTEM_INFO_H_
 
-#ifdef DEBUG
-#define VERSION_STR __DATE__ "_dbg"
-#else
-#define VERSION_STR __DATE__
-#endif
+#include "git_version.h"
 
+#ifdef DEBUG
+#define VERSION_STR __GIT_VERSION__ "_dbg"
+#else
+#define VERSION_STR __GIT_VERSION__
+#endif
 
 //----FILES----//
 
