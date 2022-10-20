@@ -22,9 +22,6 @@ static volatile DSTATUS Stat = STA_NOINIT;              /* Disk Status Flag*/
 static uint8_t CardType;                                /* SD type 0: MMC, 1: SDC, 2: Block addressing*/
 static uint8_t PowerFlag = 0;                           /* Power Status Flag */
 
-
-#define SD_CS_GPIO_Port GPIOA
-#define SD_CS_Pin GPIO_PIN_4
 /* SPI Chip Select */
 static void SELECT(void)
 {

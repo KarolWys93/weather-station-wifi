@@ -157,6 +157,24 @@ void system_init(void)
 	Logger_setMinLevel(LOG_DBG);
 	#endif
 
+	/* Factory reset (button) */
+	if(SYSTEM_PWR_RST == systemConfig.resetSrc)
+	{
+		uint32_t counter = 0;
+		while(GPIO_PIN_RESET == HAL_GPIO_ReadPin(FACTORY_RST_GPIO_Port, FACTORY_RST_Pin))
+		{
+			system_sleep(100);
+			counter++;
+		}
+
+		if((counter) > (5000/100))	//wait 5 seconds
+		{
+			Logger(LOG_VIP, "Factory reset...");
+			system_restoreDefault();
+			system_restart(1);
+		}
+	}
+
 	/* Check if config & system directories exist */
 	if(FR_NO_FILE == f_stat(DIR_PATH_SYS, NULL) || FR_NO_FILE == f_stat(DIR_PATH_CONF, NULL))
 	{
