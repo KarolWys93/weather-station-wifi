@@ -26,6 +26,8 @@
 #include "forecast_drawer.h"
 #include "system.h"
 
+#include "led.h"
+
 #define RETRY_TIME 5 //min
 
 typedef struct SForecastConfig
@@ -55,6 +57,7 @@ void runForecastApp(void)
 	{
 		Logger(LOG_WRN, "Cannot connect to WiFi");
 		system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_WIFI, "NO WIFI");
 		return;
 	}
@@ -65,6 +68,7 @@ void runForecastApp(void)
 	{
 		Logger(LOG_ERR, "time failed!");
 		system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_GENERAL, "Time error");
 		return;
 	}
@@ -74,6 +78,7 @@ void runForecastApp(void)
 	if(0 != (result = readForecastConfig(&forecastConf)))
 	{
 		Logger(LOG_ERR, "Cannot read forecast config (%d)", result);
+		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_GENERAL, "forecast conf err");
 	}
 
@@ -86,11 +91,13 @@ void runForecastApp(void)
 			Logger(LOG_WRN, "geolocation failed: %d", result);
 			if(result == 2)
 			{
+				led_setColor(LED_RED);
 				show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
 				system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
 			}
 			else
 			{
+				led_setColor(LED_RED);
 				show_error_image(ERR_IMG_GENERAL, "geolocation error");
 			}
 			return;
@@ -108,11 +115,13 @@ void runForecastApp(void)
     	Logger(LOG_WRN, "forecast req failed: %d", result);
     	if(result == 1)
     	{
+    		led_setColor(LED_RED);
     		show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
     		system_setWakeUpTimer(RETRY_TIME * 60);
     	}
     	else
     	{
+    		led_setColor(LED_RED);
     		show_error_image(ERR_IMG_GENERAL, "forecast req error");
     	}
     	return;
@@ -123,6 +132,7 @@ void runForecastApp(void)
     Logger(LOG_INF, "forecast parsing: %d", result);
     if(result != 0)
     {
+    	led_setColor(LED_RED);
     	show_error_image(ERR_IMG_GENERAL, "forecast error");
     	return;
     }

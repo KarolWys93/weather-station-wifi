@@ -21,6 +21,7 @@
 #include "e-Paper/ImageData.h"
 
 #include "images.h"
+#include "led.h"
 
 #define BCKUP_REGISTER_WKUP_CNT 1
 #define BCKUP_REGISTER_LAST_ALARM 2
@@ -44,7 +45,13 @@ typedef struct SSystemConfig
 
 
 static FATFS fs;
-static SSystemConfig systemConfig;
+static SSystemConfig systemConfig = {
+		.configMode = 0,
+		.ledIndON = 1,
+		.wakeUpCounter = 0,
+		.resetSrc = SYSTEM_PWR_RST,
+		.hostName = ""
+};
 
 static uint32_t startTimestamp = 0;
 
@@ -92,8 +99,6 @@ void system_init(void)
 			system_sleep(100);
 		}
 	}
-
-	memset(&systemConfig, 0, sizeof(SSystemConfig));
 
 	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
 	{
@@ -163,6 +168,7 @@ void system_init(void)
 		uint32_t counter = 0;
 		while(GPIO_PIN_RESET == HAL_GPIO_ReadPin(FACTORY_RST_GPIO_Port, FACTORY_RST_Pin))
 		{
+			led_setColor(LED_CYAN);
 			system_sleep(100);
 			counter++;
 		}
@@ -188,6 +194,11 @@ void system_init(void)
 	{
 		systemConfig.ledIndON = 1;
 	}
+	else
+	{
+		systemConfig.ledIndON = 0;
+		led_setColor(LED_OFF);
+	}
 
 	if(FR_OK == f_open(&file, FILE_PATH_HOSTNAME, FA_READ))
 	{
@@ -208,6 +219,8 @@ void system_init(void)
 		systemConfig.configMode += 2;
 		f_unlink(FILE_PATH_CONFIG_MODE_FLAG);
 	}
+
+	if(systemConfig.configMode) led_setColor(LED_BLUE);
 
 	Logger(LOG_INF, "Config mode %d", systemConfig.configMode);
 
@@ -415,6 +428,7 @@ static void shutdownSystem(void)
 
 static void cardMountFailed(void)
 {
+	led_setColor(LED_RED);
 	Logger(LOG_VIP, "SD card err");
 	EPD_Init();
 	show_error_image(ERR_IMG_MEMORY_CARD, "SD card err");

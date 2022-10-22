@@ -39,6 +39,7 @@
 #include "logger.h"
 #include "utils.h"
 
+#include "led.h"
 #include "images.h"
 /* USER CODE END Includes */
 
@@ -198,7 +199,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   uint16_t retryCounter = 0;
 
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+  led_setColor(LED_GREEN);
   system_init();
 
   if(system_batteryLevel() == 0 && !system_isCharging())
@@ -230,9 +231,11 @@ int main(void)
 		  {
 			  WiFi_shutdown();
 			  show_error_image(ERR_IMG_GENERAL, "WIFI error");
-			  for(uint8_t i = 0; i < 40; i++)
+			  for(uint8_t i = 0; i < 20; i++)
 			  {
-				  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+				  led_setColor(LED_RED);
+				  system_sleep(250);
+				  led_setColor(LED_OFF);
 				  system_sleep(250);
 			  }
 			  system_shutdown();
@@ -260,7 +263,6 @@ int main(void)
 		  Logger(LOG_INF, "Start server");
 		  if(0 != (serverExitCode = runServerApp(80, 5, 1000)))
 		  {
-			  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 			  Logger(LOG_ERR, "Server exit with code %d", serverExitCode);
 			  show_error_image(ERR_IMG_GENERAL, "server fatal");
 		  }

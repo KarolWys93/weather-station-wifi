@@ -426,12 +426,15 @@ int32_t httpServer_sendFile(FIL* file, char* buffer, const uint32_t bufferSize, 
 uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeout)
 {
 	char requestBuffer[HTTP_SERVER_REQUEST_SIZE];
-	g_linkID = 0;
 	uint32_t secondCounter = 0;
 	uint32_t tickTime = 0;
 	uint32_t lastActivityTick = 0;
 	int8_t status = 0;
 	bool timeIsSynced = false;
+	uint32_t exitButtonTime = 0;
+
+	g_linkID = 0;
+
 
 	if(WIFI_RESP_OK != WiFi_OpenServerSocket(port, maxConnection, serverTimeout, 1000))
 	{
@@ -466,6 +469,16 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 				timeIsSynced = timeSync(0);
 			}
 
+			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_SET)
+			{
+				if(exitButtonTime++ > 5) system_restart(0);
+			}
+			else
+			{
+				exitButtonTime = 0;
+			}
+
+
 			//every 10 second
 			if(secondCounter % 10 == 0)
 			{
@@ -473,7 +486,8 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 				if(system_batteryLevel() == 0 && !system_isCharging())
 				{
 					show_low_bat_image();
-					system_shutdown();
+					status = 0;
+					break;
 				}
 			}
 	    }

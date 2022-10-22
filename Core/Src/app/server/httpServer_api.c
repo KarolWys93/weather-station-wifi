@@ -13,6 +13,7 @@
 #include "rtc.h"
 
 #include "system.h"
+#include "led.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -856,6 +857,7 @@ HTTP_STATUS serverAPI_setLedIndicator(char* request, uint32_t reqSize)
 	{
 		if(FR_OK == f_open(&file, FILE_PATH_LED_IND_FLAG, FA_OPEN_ALWAYS))
 		{
+			led_setColor(LED_BLUE);
 			f_close(&file);
 		}
 		else
@@ -865,6 +867,7 @@ HTTP_STATUS serverAPI_setLedIndicator(char* request, uint32_t reqSize)
 	}
 	else
 	{
+		led_setColor(LED_OFF);
 		f_unlink(FILE_PATH_LED_IND_FLAG);
 	}
 
