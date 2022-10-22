@@ -14,6 +14,8 @@
 #include "../../wifi/wifi_esp.h"
 #include "fatfs.h"
 
+#include "button.h"
+
 #include "logger.h"
 #include "utils.h"
 
@@ -469,7 +471,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 				timeIsSynced = timeSync(0);
 			}
 
-			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_SET)
+			if(button_isWakeUpPressed())
 			{
 				if(exitButtonTime++ > 5) system_restart(0);
 			}

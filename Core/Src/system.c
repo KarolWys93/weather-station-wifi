@@ -22,6 +22,7 @@
 
 #include "images.h"
 #include "led.h"
+#include "button.h"
 
 #define BCKUP_REGISTER_WKUP_CNT 1
 #define BCKUP_REGISTER_LAST_ALARM 2
@@ -85,10 +86,10 @@ void system_init(void)
 	bool wkupButtonPressed = false;
 	while(1)
 	{
-		if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+		if(!button_isWakeUpPressed())
 		{
 			system_sleep(100);
-			if(HAL_GPIO_ReadPin(SYS_WKUP_GPIO_Port, SYS_WKUP_Pin) == GPIO_PIN_RESET)
+			if(!button_isWakeUpPressed())
 			{
 				break;
 			}
@@ -166,7 +167,7 @@ void system_init(void)
 	if(SYSTEM_PWR_RST == systemConfig.resetSrc)
 	{
 		uint32_t counter = 0;
-		while(GPIO_PIN_RESET == HAL_GPIO_ReadPin(FACTORY_RST_GPIO_Port, FACTORY_RST_Pin))
+		while(button_isFactoryResetPressed())
 		{
 			led_setColor(LED_CYAN);
 			system_sleep(100);
@@ -209,7 +210,7 @@ void system_init(void)
 		f_close(&file);
 	}
 
-	if(GPIO_PIN_RESET == HAL_GPIO_ReadPin(CONFIG_MODE_GPIO_Port, CONFIG_MODE_Pin))
+	if(button_isConfigModePressed())
 	{
 		systemConfig.configMode += 1;
 	}
