@@ -99,6 +99,14 @@ void drawForecast(const SForecast * const forecastData)
 		startHour = (startHour + 6) % 24;
 	}
 
+	for(uint8_t i = 0; i < DISPLAY_DATA_SIZE; i++)
+	{
+		if((forecastData->hourForecast[i + timeOffset].time + forecastData->timeZoneOffset)%(3600 * 24) == 0)
+		{
+			Paint_DrawLine(4*(i)+31, 21, 4*(i)+31, 200, BLACK, LINE_STYLE_DOTTED, DOT_PIXEL_1X1);
+		}
+	}
+
 	//TEMPERATURE
 	if((ranges.maxTemp%10))
 		ranges.maxTemp = ranges.maxTemp + (10 - ranges.maxTemp%10);
