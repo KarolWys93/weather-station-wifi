@@ -34,8 +34,8 @@ typedef struct SForecastConfig
 {
 	uint8_t updatePeriod;
 	char    apiKey[33];
-	char    lon[11];
 	char    lat[11];
+	char    lon[11];
 	char    zipCode[12];
 	char    country[3];
 } SForecastConfig;
@@ -179,7 +179,7 @@ static uint8_t forecastRequest(SForecastConfig* forecastConfig)
     		"&hourly=temperature_2m,apparent_temperature,rain,showers,snowfall,"
     		"weathercode,pressure_msl,windspeed_10m,windgusts_10m"
     		"&timeformat=unixtime&timezone=auto&start_date=%s&end_date=%s",
-    		forecastConfig->lat, forecastConfig->lon,
+			forecastConfig->lat, forecastConfig->lon,
 			startDateStr, endDateStr);
 
     HTTP_createRequestHeaderVer(dataBuff, 2048, HTTP_GET, requestPath, 0, HTTP_1_0);
@@ -349,20 +349,23 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
 		return 3;
 	}
 
-	tokenPtr = jsmn_get_token("lon", msgPayload, jsonTokens, numOfTokens);
-	if(tokenPtr == NULL){return 2;}
-	tokenSize = tokenPtr->end - tokenPtr->start;
-	if(tokenSize < 1 && tokenSize > 10){return 2;}
-	memcpy(forecastConfig->lon, msgPayload + tokenPtr->start, tokenSize);
-	forecastConfig->lon[tokenSize] = '\0';
-
-	//len
+	// N
+	// |
+	// S
 	tokenPtr = jsmn_get_token("lat", msgPayload, jsonTokens, numOfTokens);
 	if(tokenPtr == NULL){return 2;}
 	tokenSize = tokenPtr->end - tokenPtr->start;
 	if(tokenSize < 1 && tokenSize > 10){return 2;}
 	memcpy(forecastConfig->lat, msgPayload + tokenPtr->start, tokenSize);
 	forecastConfig->lat[tokenSize] = '\0';
+
+	// W - E
+	tokenPtr = jsmn_get_token("lon", msgPayload, jsonTokens, numOfTokens);
+	if(tokenPtr == NULL){return 2;}
+	tokenSize = tokenPtr->end - tokenPtr->start;
+	if(tokenSize < 1 && tokenSize > 10){return 2;}
+	memcpy(forecastConfig->lon, msgPayload + tokenPtr->start, tokenSize);
+	forecastConfig->lon[tokenSize] = '\0';
 
 	return 0;
 }

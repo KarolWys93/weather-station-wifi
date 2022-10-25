@@ -298,11 +298,9 @@ void drawForecast(const SForecast * const forecastData)
 	}
 
 	EPD_SendRed(d_red);
-	system_sleep(2);
+	system_sleep(1);
 
 	EPD_Refresh();
-	system_sleep(2);
-
 }
 
 static void getRangeValues(SRangesValues *rangeValues, const SForecast * const forecastData, uint8_t offset)
