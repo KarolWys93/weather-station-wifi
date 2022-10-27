@@ -81,8 +81,6 @@ void drawForecast(const SForecast * const forecastData)
 	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
 	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
 
-	Paint_SelectImage(d_black);
-	Paint_Clear(WHITE);
 	Paint_SelectImage(d_grey);
 	Paint_Clear(WHITE);
 
