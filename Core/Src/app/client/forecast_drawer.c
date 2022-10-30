@@ -18,6 +18,8 @@
 #include "system.h"
 #include "logger.h"
 
+#include "images.h"
+
 #define DISPLAY_DATA_SIZE 42
 
 typedef struct SRangesValues
@@ -81,11 +83,15 @@ void drawForecast(const SForecast * const forecastData)
 	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
 	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
 
-	Paint_SelectImage(d_grey);
-	Paint_Clear(WHITE);
+	load_forecastImg_BlackGrey(d_black, d_grey);
+
+//	Paint_SelectImage(d_grey);
+//	Paint_Clear(WHITE);
+//
+//	Paint_SelectImage(d_black);
+//	Paint_DrawBitMap(forecast_black);
 
 	Paint_SelectImage(d_black);
-	Paint_DrawBitMap(forecast_black);
 
 	sprintf(textBuff, "%02d/%02d", timeObject->tm_mday, timeObject->tm_mon+1);
 	Paint_DrawString(1, 8, textBuff, &Font8, WHITE, BLACK);
@@ -243,14 +249,16 @@ void drawForecast(const SForecast * const forecastData)
 		Paint_DrawRectangle(1, 1, 200, 2, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
 	}
 
+	save_img_BlackGrey(d_black, d_grey);
 	EPD_SendBlackAndGrey(d_black, d_grey);
 
 	//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	//red
 	Paint_SelectImage(d_red);
-	Paint_Clear(WHITE);
-	Paint_DrawBitMap(forecast_red);
+	load_forecastImg_Red(d_red);
+//	Paint_Clear(WHITE);
+//	Paint_DrawBitMap(forecast_red);
 
 	//feel temp
 	for(uint8_t i = 0; i < DISPLAY_DATA_SIZE; i++)
@@ -295,6 +303,7 @@ void drawForecast(const SForecast * const forecastData)
 		Paint_DrawRectangle(1, 1, 200, 2, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
 	}
 
+	save_img_Red(d_red);
 	EPD_SendRed(d_red);
 	system_sleep(1);
 

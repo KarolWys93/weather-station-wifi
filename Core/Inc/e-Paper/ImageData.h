@@ -35,11 +35,7 @@
 extern const unsigned char forecast_black[];
 extern const unsigned char forecast_red[];
 
-extern const unsigned char error_b[];
-extern const unsigned char no_wifi_b[];
 extern const unsigned char sd_err_b[];
-extern const unsigned char settings_b[];
-extern const unsigned char settings_g[];
 
 #endif
 /* FILE END */

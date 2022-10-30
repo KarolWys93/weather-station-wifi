@@ -17,6 +17,8 @@
 #endif
 
 //----FILES----//
+#define DIR_PATH_IMG "/img"
+#define DIR_PATH_SCREEN_DUMP DIR_PATH_IMG"/scr"
 
 #define DIR_PATH_SYS "/sys"
 #define DIR_PATH_CONF "/conf"

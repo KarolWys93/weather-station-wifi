@@ -21,10 +21,10 @@ if __name__ == '__main__':
     imgArray = np.array(img)
 
     mask = ~((imgArray == blackColor).all(-1) | (imgArray == redColor).all(-1))
-    Image.fromarray(mask).convert("1").save(filePathPattern+"_black.bmp")
+    Image.fromarray(mask).convert("1").save(filePathPattern+"_b.bmp")
 
     mask = ~((imgArray == greyColor).all(-1))
-    Image.fromarray(mask).convert("1").save(filePathPattern+"_grey.bmp")
+    Image.fromarray(mask).convert("1").save(filePathPattern+"_g.bmp")
 
     mask = ~((imgArray == pinkColor).all(-1) | (imgArray == redColor).all(-1))
-    Image.fromarray(mask).convert("1").save(filePathPattern+"_red.bmp")
+    Image.fromarray(mask).convert("1").save(filePathPattern+"_r.bmp")
