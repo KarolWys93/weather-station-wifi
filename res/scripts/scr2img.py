@@ -12,7 +12,8 @@ if __name__ == '__main__':
 
 
     if len(sys.argv) == 1:
-        print("Wrong arguments number!")
+        print("Usage: python "+sys.argv[0]+" black_epd_file grey_epd_file red_epd_file output_img_file")
+        print("Combine epd buffers into an image file")
         exit(0)
 
     if len(sys.argv) != 5:

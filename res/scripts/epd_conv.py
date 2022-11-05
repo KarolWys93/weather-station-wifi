@@ -5,6 +5,11 @@ from PIL import Image
 
 if __name__ == '__main__':
 
+    if len(sys.argv) == 1:
+        print("Usage: python "+sys.argv[0]+" img_file")
+        print("Convert image to epd file. The output file is saved to the location of the input image file.")
+        exit(0)
+
     if len(sys.argv) != 2:
         print("Wrong arguments number!")
         exit(1)
