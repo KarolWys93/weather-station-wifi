@@ -3,6 +3,12 @@ import os
 import numpy as np
 from PIL import Image
 
+
+def usage_print():
+    print("Usage: python " + sys.argv[0] + " black_epd_file grey_epd_file red_epd_file output_img_file")
+    print("Combine epd buffers into an image file")
+
+
 if __name__ == '__main__':
     blackColor = (0, 0, 0)
     redColor = (237, 28, 36)
@@ -10,14 +16,13 @@ if __name__ == '__main__':
     pinkColor = (239, 136, 190)
     whiteColor = (255, 255, 255)
 
-
     if len(sys.argv) == 1:
-        print("Usage: python "+sys.argv[0]+" black_epd_file grey_epd_file red_epd_file output_img_file")
-        print("Combine epd buffers into an image file")
+        usage_print()
         exit(0)
 
     if len(sys.argv) != 5:
         print("Wrong arguments number!")
+        usage_print()
         exit(1)
 
     filePathBlack = sys.argv[1]
