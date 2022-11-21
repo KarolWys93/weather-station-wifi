@@ -80,6 +80,7 @@ void runForecastApp(void)
 		Logger(LOG_ERR, "Cannot read forecast config (%d)", result);
 		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_GENERAL, "forecast conf err");
+		return;
 	}
 
 	//geolocation
