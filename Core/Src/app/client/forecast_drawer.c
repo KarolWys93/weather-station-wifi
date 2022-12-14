@@ -38,6 +38,8 @@ typedef struct SRangesValues
 
 
 static void getRangeValues(SRangesValues *rangeValues, const SForecast * const forecastData, uint8_t offset);
+static inline int16_t tempRoundUp(int16_t temp);
+static inline int16_t tempRoundDown(int16_t temp);
 
 void drawForecast(const SForecast * const forecastData)
 {
@@ -112,13 +114,11 @@ void drawForecast(const SForecast * const forecastData)
 	}
 
 	//TEMPERATURE
-	if((ranges.maxTemp%10))
-		ranges.maxTemp = ranges.maxTemp + (10 - ranges.maxTemp%10);
-	ranges.minTemp = 10*((ranges.minTemp/10));
+	ranges.maxTemp = tempRoundUp(ranges.maxTemp);
+	ranges.minTemp = tempRoundDown(ranges.minTemp);
 
-	if((ranges.maxFtemp%10))
-		ranges.maxFtemp = ranges.maxFtemp + (10 - ranges.maxFtemp%10);
-	ranges.minFtemp = 10*((ranges.minFtemp/10));
+	ranges.maxFtemp = tempRoundUp(ranges.maxFtemp);
+	ranges.minFtemp = tempRoundDown(ranges.minFtemp);
 
 	maxTempRange = ranges.maxTemp > ranges.maxFtemp ? ranges.maxTemp : ranges.maxFtemp;
 	minTempRange = ranges.minTemp < ranges.minFtemp ? ranges.minTemp : ranges.minFtemp;
@@ -356,4 +356,26 @@ static void getRangeValues(SRangesValues *rangeValues, const SForecast * const f
 	Logger(LOG_DBG, "Range rain/snow [%d:%d]", rangeValues->maxRain, rangeValues->maxSnow);
 	Logger(LOG_DBG, "Range pressure [%d:%d]", rangeValues->minPressure, rangeValues->maxPressure);
 	Logger(LOG_DBG, "Range wind/gust [%d:%d]", rangeValues->maxWind, rangeValues->maxGWind);
+}
+
+static inline int16_t tempRoundUp(int16_t temp)
+{
+    if((temp%10))
+    {
+        if(temp > 0)
+        {
+           temp = temp + (10 - temp%10);
+        }
+        else
+        {
+            temp = 10*((temp/10));
+        }
+    }
+
+    return temp;
+}
+
+static inline int16_t tempRoundDown(int16_t temp)
+{
+    return -tempRoundUp(-temp);
 }
