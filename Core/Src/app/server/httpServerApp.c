@@ -252,9 +252,13 @@ static int8_t handleRequest(char* requestPtr, uint16_t requestSize)
 		{
 			status = serverAPI_restoreDefaultSettings(requestPtr, requestSize);
 		}
-		else if(0 == strcmp(path, "/api/voltage_test"))
+		else if(0 == strcmp(path, "/api/logs"))
 		{
-			status = serverAPI_voltage_test(requestPtr, requestSize);
+			status = serverAPI_logs(requestPtr, requestSize);
+		}
+		else if(0 == strcmp(path, "/api/voltage"))
+		{
+			status = serverAPI_voltage(requestPtr, requestSize);
 		}
 		else if(0 == strcmp(path, "/pop"))
 		{

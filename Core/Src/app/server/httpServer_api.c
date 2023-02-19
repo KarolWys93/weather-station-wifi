@@ -12,6 +12,8 @@
 #include "../../wifi/wifi_esp.h"
 #include "rtc.h"
 
+#include "logger.h"
+
 #include "system.h"
 #include "led.h"
 
@@ -895,7 +897,7 @@ HTTP_STATUS serverAPI_restoreDefaultSettings(char* request, uint32_t reqSize)
 	}
 }
 
-HTTP_STATUS serverAPI_voltage_test(char* request, uint32_t reqSize)
+HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize)
 {
 	char responseBuff[256];
 
@@ -904,4 +906,110 @@ HTTP_STATUS serverAPI_voltage_test(char* request, uint32_t reqSize)
 	return sendResponse(200, responseBuff, strlen(responseBuff));
 }
 
+HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize)
+{
+	FIL file;
+	FILINFO fileInfo;
+	uint32_t fileSize_1 = 0;
+	uint32_t fileSize_2 = 0;
 
+	uint32_t headerSize = 0;
+	char responseBuffer[2048];
+	char* params = responseBuffer;
+	int16_t paramsSize = 0;
+
+	uint32_t maxLogSize = 20 * 1024;	//20kB default size
+
+	uint32_t toSendSize_file_1 = 0;
+	uint32_t toSendSize_file_2 = 0;
+	uint32_t offset_file_1 = 0;
+	uint32_t offset_file_2 = 0;
+
+
+	Logger_sync();
+	if(0 < (paramsSize = HTTP_getURLParams(request, reqSize, params, 2048)))
+	{
+		if(paramsSize > 5 && 0 == strncmp(params, "size=", 5))
+		{
+			maxLogSize = atoi(params+5) * 1024;
+			if(maxLogSize > LOG_MAX_FILE_SIZE) maxLogSize = LOG_MAX_FILE_SIZE;
+		}
+	}
+
+	memset(&fileInfo, 0, sizeof(FILINFO));
+	if(FR_OK == f_stat(LOG_PATH"/"LOG_FILE_NAME, &fileInfo))
+	{
+		fileSize_1 = fileInfo.fsize;
+	}
+
+
+	if(fileSize_1 < maxLogSize)
+	{
+		toSendSize_file_1 = fileSize_1;
+		offset_file_1 = 0;
+		toSendSize_file_2 = maxLogSize - toSendSize_file_1;
+
+		memset(&fileInfo, 0, sizeof(FILINFO));
+		if(FR_OK == f_stat(LOG_PATH"/1_"LOG_FILE_NAME, &fileInfo))
+		{
+			fileSize_2 = fileInfo.fsize;
+		}
+
+		if(fileSize_2 > toSendSize_file_2)
+		{
+			offset_file_2 = fileSize_2 - toSendSize_file_2;
+		}
+		else
+		{
+			offset_file_2 = 0;
+			toSendSize_file_2 = fileSize_2;
+		}
+	}
+	else
+	{
+		toSendSize_file_1 = maxLogSize;
+		offset_file_1 = fileSize_1 - toSendSize_file_1;
+		toSendSize_file_2 = 0;
+		offset_file_2 = 0;
+	}
+
+
+	headerSize = HTTP_createResponseHeader(responseBuffer, sizeof(responseBuffer), 200, toSendSize_file_1 + toSendSize_file_2);
+	if(headerSize < 0)
+	{
+		return HTTP_SERVER_ERROR;
+	}
+
+	if(toSendSize_file_2 > 0 && FR_OK == f_open(&file, LOG_PATH"/1_"LOG_FILE_NAME, FA_READ))
+	{
+		f_lseek(&file, offset_file_2);
+		httpServer_sendFile(&file, responseBuffer, 2048, headerSize, toSendSize_file_2);
+		f_close(&file);
+		Logger_pause(1);
+		if(FR_OK == f_open(&file, LOG_PATH"/"LOG_FILE_NAME, FA_READ))
+		{
+			httpServer_sendFile(&file, responseBuffer, 2048, 0, toSendSize_file_1);
+			f_close(&file);
+		}
+		else
+		{
+			return HTTP_SERVER_CRITICAL_ERROR;
+		}
+	}
+	else
+	{
+		Logger_pause(1);
+		if(FR_OK == f_open(&file, LOG_PATH"/"LOG_FILE_NAME, FA_READ))
+		{
+			f_lseek(&file, offset_file_1);
+			httpServer_sendFile(&file, responseBuffer, 2048, headerSize, toSendSize_file_1);
+			f_close(&file);
+		}
+		else
+		{
+			return HTTP_SERVER_CRITICAL_ERROR;
+		}
+	}
+	Logger_pause(0);
+	return HTTP_SERVER_OK;
+}

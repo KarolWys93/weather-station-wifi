@@ -19,6 +19,7 @@ static FIL logFile;
 static Log_Level currentLogLvl;
 static uint32_t lastSyncStamp;
 static uint8_t logInitialized = 0;
+static uint8_t logPaused = 0;
 
 static char buffer[LOG_MAX_LINE_SIZE] = "";
 
@@ -63,17 +64,18 @@ uint8_t Logger_init(void)
 
 	currentLogLvl = LOG_INF;
 	f_mkdir (LOG_PATH);
+
 	result = f_open(&logFile, LOG_PATH"/"LOG_FILE_NAME, FA_OPEN_ALWAYS|FA_WRITE);
 	if(result != FR_OK)
 	{
 		return result;
 	}
-
 	f_lseek(&logFile, f_size(&logFile));
 
 	lastSyncStamp = 0;
 
 	logInitialized = 1;
+	logPaused = 0;
 	Logger(LOG_VIP, "=-=-=-=-=-=");
 	Logger(LOG_INF, "Logger started");
 
@@ -84,6 +86,33 @@ void Logger_shutdown(void)
 {
 	Logger(LOG_VIP, "Logger shutdown");
 	f_close(&logFile);
+	logInitialized = 0;
+	logPaused = 0;
+}
+
+uint8_t Logger_pause(uint8_t pause)
+{
+	FRESULT result;
+	if(!logInitialized)
+	{
+		return 1;
+	}
+	if(pause)
+	{
+		f_close(&logFile);
+		logPaused = 1;
+	}
+	else
+	{
+		result = f_open(&logFile, LOG_PATH"/"LOG_FILE_NAME, FA_WRITE);
+		if(result != FR_OK)
+		{
+			return 1;
+		}
+		f_lseek(&logFile, f_size(&logFile));
+		logPaused = 0;
+	}
+	return 0;
 }
 
 void Logger_setMinLevel(Log_Level level)
@@ -98,7 +127,7 @@ Log_Level Logger_getMinLevel(void)
 
 void Logger_sync(void)
 {
-	if(!logInitialized) return;
+	if(!logInitialized || logPaused) return;
 
 	f_sync(&logFile);
 
@@ -139,7 +168,7 @@ void Logger(Log_Level level, char* fmt, ...)
 	HAL_UART_Transmit_DMA(&LOG_UART, (uint8_t*)buffer, strlen(buffer));
 #endif
 
-	if(!logInitialized) return;
+	if(!logInitialized || logPaused) return;
 
 	//1970/10/23 00:46:46 INF log text
 	currentTime = RTC_getTime();

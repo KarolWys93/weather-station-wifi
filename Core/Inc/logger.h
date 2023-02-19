@@ -17,7 +17,7 @@
 
 #define LOG_MAX_LINE_SIZE 128
 
-#define LOG_SYNC_TIME 1 * 1000    //in usec
+#define LOG_SYNC_TIME 1 * 1000    //in msec
 
 #define LOGGER_USE_UART
 
@@ -37,6 +37,8 @@ typedef enum Log_Level
 
 uint8_t Logger_init(void);
 void Logger_shutdown(void);
+
+uint8_t Logger_pause(uint8_t pause);
 
 void Logger_setMinLevel(Log_Level level);
 Log_Level Logger_getMinLevel(void);
