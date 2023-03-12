@@ -191,12 +191,9 @@ Wifi_RespStatus WiFi_restart(uint32_t timeout)
 
 	WiFi_MessageReceivingStop();
 
-	HAL_GPIO_WritePin(WiFi_RST_GPIO, WiFi_RST_PIN, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(WiFi_PWR_GPIO, WiFi_PWR_PIN, GPIO_PIN_RESET);
-	system_sleep(250);
-	HAL_GPIO_WritePin(WiFi_PWR_GPIO, WiFi_PWR_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(WiFi_EN_GPIO, WiFi_EN_PIN, GPIO_PIN_RESET);
 	system_sleep(500);
-	HAL_GPIO_WritePin(WiFi_RST_GPIO, WiFi_RST_PIN, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(WiFi_EN_GPIO, WiFi_EN_PIN, GPIO_PIN_SET);
 	system_sleep(1000);
 
 	memset((void*)&wifiStatus, 0, sizeof(SWiFiStatus));
@@ -284,9 +281,7 @@ Wifi_RespStatus WiFi_restart(uint32_t timeout)
 void WiFi_shutdown(void)
 {
 	WiFi_MessageReceivingStop();
-	HAL_GPIO_WritePin(WiFi_RST_GPIO, WiFi_RST_PIN, GPIO_PIN_RESET);
-	system_sleep(100);
-	HAL_GPIO_WritePin(WiFi_PWR_GPIO, WiFi_PWR_PIN, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(WiFi_EN_GPIO, WiFi_EN_PIN, GPIO_PIN_RESET);
 }
 
 

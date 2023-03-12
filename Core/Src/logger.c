@@ -85,6 +85,7 @@ uint8_t Logger_init(void)
 void Logger_shutdown(void)
 {
 	Logger(LOG_VIP, "Logger shutdown");
+	f_sync(&logFile);
 	f_close(&logFile);
 	logInitialized = 0;
 	logPaused = 0;

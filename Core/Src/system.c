@@ -142,6 +142,7 @@ void system_init(void)
 	startBatteryMeasurement();
 
 	/* Mount SD Card */
+	HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_SET);  //TODO: pwr sd card should be somewhere else
 	if(FR_OK != f_mount(&fs, "", 1))
 	{
 		cardMountFailed();
@@ -425,6 +426,7 @@ static void shutdownSystem(void)
 	Logger(LOG_INF, "Run time: %u ms", HAL_GetTick()-startTimestamp);
 	Logger_shutdown();
 	f_mount(NULL, "", 1);
+	HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_RESET);  //TODO: pwr sd card should be somewhere else
 }
 
 static void cardMountFailed(void)

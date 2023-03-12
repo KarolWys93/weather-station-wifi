@@ -17,10 +17,8 @@
 #define SNTP_ADDRESS_3	"0.pool.ntp.org"
 
 #define WiFiUart huart1
-#define WiFi_RST_GPIO	WIFI_RST_GPIO_Port
-#define WiFi_RST_PIN	WIFI_RST_Pin
-#define WiFi_PWR_GPIO	WIFI_PWR_GPIO_Port
-#define WiFi_PWR_PIN	WIFI_PWR_Pin
+#define WiFi_EN_GPIO	ESP_EN_GPIO_Port
+#define WiFi_EN_PIN	    ESP_EN_Pin
 
 typedef enum Wifi_RespStatus
 {

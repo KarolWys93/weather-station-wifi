@@ -65,7 +65,7 @@
 **/
 #define EPD_RST_PIN     D_RST_GPIO_Port, D_RST_Pin
 #define EPD_DC_PIN      D_DC_GPIO_Port, D_DC_Pin
-#define EPD_CS_PIN      SPI2_CS_GPIO_Port, SPI2_CS_Pin
+#define EPD_CS_PIN      D_CS_GPIO_Port, D_CS_Pin
 #define EPD_BUSY_PIN    D_BUSY_GPIO_Port, D_BUSY_Pin
 
 /**

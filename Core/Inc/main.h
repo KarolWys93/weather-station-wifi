@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -60,46 +60,59 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CONFIG_MODE_Pin GPIO_PIN_13
-#define CONFIG_MODE_GPIO_Port GPIOC
-#define D_BUSY_Pin GPIO_PIN_0
-#define D_BUSY_GPIO_Port GPIOC
-#define D_DC_Pin GPIO_PIN_1
-#define D_DC_GPIO_Port GPIOC
-#define FACTORY_RST_Pin GPIO_PIN_3
-#define FACTORY_RST_GPIO_Port GPIOC
+#define LED_G_Pin GPIO_PIN_13
+#define LED_G_GPIO_Port GPIOC
+#define LED_R_Pin GPIO_PIN_14
+#define LED_R_GPIO_Port GPIOC
+#define LED_B_Pin GPIO_PIN_15
+#define LED_B_GPIO_Port GPIOC
 #define SYS_WKUP_Pin GPIO_PIN_0
 #define SYS_WKUP_GPIO_Port GPIOA
+#define CONFIG_MODE_Pin GPIO_PIN_4
+#define CONFIG_MODE_GPIO_Port GPIOA
+#define D_CLK_Pin GPIO_PIN_5
+#define D_CLK_GPIO_Port GPIOA
+#define FACTORY_RST_Pin GPIO_PIN_6
+#define FACTORY_RST_GPIO_Port GPIOA
+#define D_DIN_Pin GPIO_PIN_7
+#define D_DIN_GPIO_Port GPIOA
+#define D_CS_Pin GPIO_PIN_0
+#define D_CS_GPIO_Port GPIOB
 #define BAT_ADC_Pin GPIO_PIN_1
-#define BAT_ADC_GPIO_Port GPIOA
-#define BAT_ADC_GND_Pin GPIO_PIN_4
-#define BAT_ADC_GND_GPIO_Port GPIOA
-#define LD2_Pin GPIO_PIN_5
-#define LD2_GPIO_Port GPIOA
-#define D_RST_Pin GPIO_PIN_0
+#define BAT_ADC_GPIO_Port GPIOB
+#define D_DC_Pin GPIO_PIN_2
+#define D_DC_GPIO_Port GPIOB
+#define D_RST_Pin GPIO_PIN_10
 #define D_RST_GPIO_Port GPIOB
-#define SD_PWR_Pin GPIO_PIN_12
-#define SD_PWR_GPIO_Port GPIOB
-#define SPI2_CS_Pin GPIO_PIN_14
-#define SPI2_CS_GPIO_Port GPIOB
-#define LED_B_Pin GPIO_PIN_7
-#define LED_B_GPIO_Port GPIOC
-#define WIFI_RST_Pin GPIO_PIN_8
-#define WIFI_RST_GPIO_Port GPIOC
-#define LED_R_Pin GPIO_PIN_8
-#define LED_R_GPIO_Port GPIOA
-#define LED_G_Pin GPIO_PIN_9
-#define LED_G_GPIO_Port GPIOA
-#define SPI1_CS_Pin GPIO_PIN_10
-#define SPI1_CS_GPIO_Port GPIOA
-#define TMS_Pin GPIO_PIN_13
-#define TMS_GPIO_Port GPIOA
-#define TCK_Pin GPIO_PIN_14
-#define TCK_GPIO_Port GPIOA
+#define D_BUSY_Pin GPIO_PIN_11
+#define D_BUSY_GPIO_Port GPIOB
+#define SD_CS_Pin GPIO_PIN_12
+#define SD_CS_GPIO_Port GPIOB
+#define SD_CLK_Pin GPIO_PIN_13
+#define SD_CLK_GPIO_Port GPIOB
+#define SD_MISO_Pin GPIO_PIN_14
+#define SD_MISO_GPIO_Port GPIOB
+#define SD_MOSI_Pin GPIO_PIN_15
+#define SD_MOSI_GPIO_Port GPIOB
+#define SD_PWR_Pin GPIO_PIN_8
+#define SD_PWR_GPIO_Port GPIOA
+#define ESP_TX_Pin GPIO_PIN_9
+#define ESP_TX_GPIO_Port GPIOA
+#define ESP_RX_Pin GPIO_PIN_10
+#define ESP_RX_GPIO_Port GPIOA
+#define BAT_ADC_GND_Pin GPIO_PIN_11
+#define BAT_ADC_GND_GPIO_Port GPIOA
+#define SWDIO_Pin GPIO_PIN_13
+#define SWDIO_GPIO_Port GPIOA
+#define SWCLK_Pin GPIO_PIN_14
+#define SWCLK_GPIO_Port GPIOA
+#define USB_DET_Pin GPIO_PIN_7
+#define USB_DET_GPIO_Port GPIOB
 #define BAT_CHR_Pin GPIO_PIN_8
 #define BAT_CHR_GPIO_Port GPIOB
-#define WIFI_PWR_Pin GPIO_PIN_9
-#define WIFI_PWR_GPIO_Port GPIOB
+#define ESP_EN_Pin GPIO_PIN_9
+#define ESP_EN_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
