@@ -589,13 +589,5 @@ info:
 ******************************************************************************/
 void Paint_DrawBitMap(const unsigned char* image_buffer)
 {
-    UWORD x, y;
-    UDOUBLE Addr = 0;
-
-    for (y = 0; y < Paint.HeightByte; y++) {
-        for (x = 0; x < Paint.WidthByte; x++) {//8 pixel =  1 byte
-            Addr = x + y * Paint.WidthByte;
-            Paint.Image[Addr] = (unsigned char)image_buffer[Addr];
-        }
-    }
+    memcpy(Paint.Image, image_buffer, (Paint.WidthByte*Paint.HeightByte -1));
 }

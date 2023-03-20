@@ -82,8 +82,8 @@ void drawForecast(const SForecast * const forecastData)
 	getRangeValues(&ranges, forecastData, timeOffset);
 
 	//black & grey
-	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
-	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, 0, WHITE);
+	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
+	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
 
 	load_forecastImg_BlackGrey(d_black, d_grey);
 

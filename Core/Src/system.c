@@ -143,6 +143,7 @@ void system_init(void)
 
 	/* Mount SD Card */
 	HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_SET);  //TODO: pwr sd card should be somewhere else
+	HAL_Delay(200);
 	if(FR_OK != f_mount(&fs, "", 1))
 	{
 		cardMountFailed();
@@ -426,6 +427,7 @@ static void shutdownSystem(void)
 	Logger(LOG_INF, "Run time: %u ms", HAL_GetTick()-startTimestamp);
 	Logger_shutdown();
 	f_mount(NULL, "", 1);
+	HAL_Delay(100);
 	HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_RESET);  //TODO: pwr sd card should be somewhere else
 }
 
