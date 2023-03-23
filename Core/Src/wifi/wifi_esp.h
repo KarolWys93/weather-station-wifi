@@ -118,4 +118,5 @@ Wifi_RespStatus WiFi_setSNTPconfig(uint8_t enable, int8_t timezone, uint32_t tim
 Wifi_RespStatus WiFi_getSNTPtime(time_t* timeSecPtr, uint32_t timeout);
 
 bool WiFi_SendingComplete(void);
+
 #endif /* WIFI_ESP_H_ */

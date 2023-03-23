@@ -45,7 +45,7 @@ void drawForecast(const SForecast * const forecastData)
 {
 	SRangesValues ranges;
 	uint8_t battery = system_batteryLevel();
-	uint8_t isCharging = system_isCharging();
+	uint8_t isCharging = system_powerStatus();
 
 	uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
@@ -190,8 +190,8 @@ void drawForecast(const SForecast * const forecastData)
 		}
 		if(forecastData->hourForecast[timeOffset + i].condition == WEATHER_STORM)
 		{
-			Paint_DrawPoint(4*i+31, 75, WHITE, DOT_PIXEL_3X3, DOT_FILL_RIGHTUP);
-			Paint_DrawPoint(4*i+31, 75, BLACK, DOT_PIXEL_3X3, DOT_FILL_RIGHTUP);
+			Paint_DrawPoint(4*i+31-2, 75, WHITE, DOT_PIXEL_6X6, DOT_FILL_RIGHTUP);
+			Paint_DrawPoint(4*i+31-2, 75, BLACK, DOT_PIXEL_6X6, DOT_FILL_RIGHTUP);
 		}
 	}
 
@@ -281,9 +281,11 @@ void drawForecast(const SForecast * const forecastData)
 		{
 			Paint_DrawRectangle(4*i+33, startSnow, 4*i+34, 125, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);	//snow
 		}
+
 		if(forecastData->hourForecast[timeOffset + i].condition == WEATHER_STORM)
 		{
-			Paint_DrawPoint(4*i+31, 75, WHITE, DOT_PIXEL_3X3, DOT_FILL_RIGHTUP);
+			Paint_DrawPoint(4*i+31-2, 75, WHITE, DOT_PIXEL_6X6, DOT_FILL_RIGHTUP);
+			Paint_DrawPoint(4*i+31-2, 75, BLACK, DOT_PIXEL_6X6, DOT_FILL_RIGHTUP);
 		}
 	}
 

@@ -142,7 +142,7 @@ HTTP_STATUS serverAPI_status(char* request, uint32_t reqSize)
 	sprintf(response, "{\"wifi_stat\":%d,\"bat\":%d,\"charging\":%d,\"ver\":\"%s\",\"ver_wifi\":\"",
 			wifiStatus.connectedToAP? 1 : 0,
 			system_batteryLevel(),
-			system_isCharging(),
+			system_powerStatus(),
 			VERSION_STR);
 
 	if(WIFI_RESP_OK != WiFi_GetVersionString(response + strlen(response), 20, 1000)) return HTTP_SERVER_ERROR;
@@ -901,7 +901,7 @@ HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize)
 {
 	char responseBuff[256];
 
-	sprintf(responseBuff, "{\"voltage\":\"%lu\",\"bat_lvl\":%u,\"bat_chr\":%u}", system_batteryVoltage(), system_batteryLevel(), system_isCharging());
+	sprintf(responseBuff, "{\"voltage\":\"%lu\",\"bat_lvl\":%u,\"bat_chr\":%u}", system_batteryVoltage(), system_batteryLevel(), system_powerStatus());
 
 	return sendResponse(200, responseBuff, strlen(responseBuff));
 }

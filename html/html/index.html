@@ -81,6 +81,11 @@
 					$("#battery").addClass('text-success');
 					$("#battery").text("DC adapter");
 				}
+				else if(data.charging === 2)
+				{
+					$("#battery").addClass('text-success');
+					$("#battery").text("Charging");
+				}
 				else
 				{
 					$("#battery").removeClass('text-success');

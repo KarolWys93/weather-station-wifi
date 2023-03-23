@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include "system_info.h"
+#include "system_power.h"
 
 
 //----FUNCTIONS-----
@@ -23,10 +24,6 @@ void system_setWakeUpTimer(uint32_t seconds);
 char* const system_getHostName(void);
 uint8_t system_isLedIndicatorOn(void);
 uint8_t system_isConfigModeOn(void);
-
-uint8_t system_isCharging(void);
-uint32_t system_batteryVoltage(void);
-uint8_t system_batteryLevel(void);
 
 void system_sleep(uint32_t miliseconds);
 

@@ -203,7 +203,7 @@ int main(void)
   led_setColor(LED_GREEN);
   system_init();
 
-  if(system_batteryLevel() == 0 && !system_isCharging())
+  if(system_batteryLevel() == 0 && SYSTEM_POWER_BATTERY == system_powerStatus())
   {
 	  show_low_bat_image();
 	  system_shutdown();

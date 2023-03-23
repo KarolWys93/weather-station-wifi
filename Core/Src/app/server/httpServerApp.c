@@ -489,7 +489,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 			if(secondCounter % 10 == 0)
 			{
 				//power check
-				if(system_batteryLevel() == 0 && !system_isCharging())
+				if(system_batteryLevel() == 0 && SYSTEM_POWER_BATTERY == system_powerStatus())
 				{
 					show_low_bat_image();
 					status = 0;
