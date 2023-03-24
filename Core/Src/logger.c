@@ -21,7 +21,7 @@ static uint32_t lastSyncStamp;
 static uint8_t logInitialized = 0;
 static uint8_t logPaused = 0;
 
-static char buffer[LOG_MAX_LINE_SIZE] = "";
+static char buffer[LOG_MAX_LINE_SIZE+1] = "";
 
 #if LOG_FILE_ROTATION < 1
  #error "LOG_FILE_ROTATION cannot be less than 1"
@@ -157,15 +157,11 @@ void Logger(Log_Level level, char* fmt, ...)
 	va_list args;
 	va_start (args, fmt);
 	vsnprintf(buffer, LOG_MAX_LINE_SIZE-1, fmt, args);
-	perror (buffer);
+	// perror (buffer);
 	va_end (args);
 
+	strcat(buffer, "\n");
 #ifdef LOGGER_USE_UART
-//TODO: send \r\n in interrupt after sending is over
-//	if(LOG_MAX_LINE_SIZE-3 > strlen(buffer))
-//	{
-//		strcat(buffer, "\r\n");
-//	}
 	HAL_UART_Transmit_DMA(&LOG_UART, (uint8_t*)buffer, strlen(buffer));
 #endif
 
@@ -174,7 +170,7 @@ void Logger(Log_Level level, char* fmt, ...)
 	//1970/10/23 00:46:46 INF log text
 	currentTime = RTC_getTime();
 	t = gmtime(&currentTime);
-	f_printf(&logFile, "%d/%02d/%02d %02d:%02d:%02d %s %s\n",
+	f_printf(&logFile, "%d/%02d/%02d %02d:%02d:%02d %s %s",
 			t->tm_year + 1900,
 			t->tm_mon + 1,
 			t->tm_mday,
