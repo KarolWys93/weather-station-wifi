@@ -96,8 +96,6 @@ void system_init(void)
 		/* Clear standby flag */
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
 
-		/* Clear wakeup flag */
-		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
 		if(wkupButtonPressed)
 		{
@@ -232,6 +230,10 @@ void system_init(void)
 void system_shutdown(void)
 {
 	shutdownSystem();
+
+	/* Clear wakeup flag */
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
 	HAL_PWR_EnterSTANDBYMode();
 }
 
