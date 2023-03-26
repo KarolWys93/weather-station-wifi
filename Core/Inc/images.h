@@ -27,4 +27,7 @@ void show_error_image(ERR_IMAGE errImg, char* errText);
 void show_configMode_image(void);
 void show_low_bat_image(void);
 
+void draw_battery_level_black(uint8_t* black_buff, uint8_t batteryLvl, uint8_t isCharging);
+void draw_battery_level_red(uint8_t* red_buff, uint8_t batteryLvl, uint8_t isCharging);
+
 #endif /* IMAGES_H_ */

@@ -16,6 +16,7 @@
 
 #include "fatfs.h"
 #include "system_info.h"
+#include "system_power.h"
 #include <stdio.h>
 
 
@@ -222,6 +223,9 @@ void show_error_image(ERR_IMAGE errImg, char* errText)
 	uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t *d_red = d_black;
 
+	uint8_t isCharging = system_powerStatus();
+	uint8_t batteryLvl = system_batteryLevel();
+
 	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
 	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
 
@@ -257,10 +261,14 @@ void show_error_image(ERR_IMAGE errImg, char* errText)
 		Paint_DrawString(textSize, 140, errText, font, WHITE, BLACK);
 	}
 
+	draw_battery_level_black(d_black, batteryLvl, isCharging);
+
 	EPD_SendBlackAndGrey(d_black, d_grey);
 
 	Paint_SelectImage(d_red);
 	img_loadRed(imageName, d_red);
+
+	draw_battery_level_black(d_red, batteryLvl, isCharging);
 	EPD_SendRed(d_red);
 
 	EPD_Refresh();
@@ -305,4 +313,31 @@ void show_low_bat_image(void)
 	EPD_SendRed(d_red);
 
 	EPD_Refresh();
+}
+
+void draw_battery_level_black(uint8_t* black_buff, uint8_t batteryLvl, uint8_t isCharging)
+{
+	if(batteryLvl > 100) batteryLvl = 100;
+	Paint_SelectImage(black_buff);
+
+	Paint_DrawRectangle(1, 1, 200, 2, WHITE, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	if(!isCharging)
+	{
+		Paint_DrawRectangle(1, 1, batteryLvl*2, 2, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	}
+	else
+	{
+		Paint_DrawRectangle(1, 1, 200, 2, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	}
+}
+
+void draw_battery_level_red(uint8_t* red_buff, uint8_t batteryLvl, uint8_t isCharging)
+{
+	(void) batteryLvl;
+	Paint_SelectImage(red_buff);
+	Paint_DrawRectangle(1, 1, 200, 2, WHITE, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	if(isCharging)
+	{
+		Paint_DrawRectangle(1, 1, 200, 2, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+	}
 }

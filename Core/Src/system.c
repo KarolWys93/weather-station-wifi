@@ -124,7 +124,7 @@ void system_init(void)
 	}
 
 	/* Start battery voltage measurement*/
-	system_power_init();
+	system_powerInit();
 
 	/* Mount SD Card */
 	HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_SET);  //TODO: pwr sd card should be somewhere else
@@ -376,5 +376,7 @@ static void cardMountFailed(void)
 	EPD_Init();
 	show_error_image(ERR_IMG_MEMORY_CARD, "SD card err");
 	EPD_Sleep();
+	/* Clear wakeup flag */
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 	HAL_PWR_EnterSTANDBYMode();
 }

@@ -25,7 +25,7 @@ static volatile uint8_t bat_adc_is_runing = 0;
 static void startBatteryMeasurement(void);
 static uint32_t filterVoltageValue(uint32_t voltage);
 
-void system_power_init(void)
+void system_powerInit(void)
 {
 	HAL_ADCEx_Calibration_Start(&hadc1);
 	startBatteryMeasurement();

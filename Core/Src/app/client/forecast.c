@@ -66,6 +66,7 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
 		return 2;
 	}
 	forecastData->timeZoneOffset = atoi(dataPtr);
+	Logger(LOG_INF, "Forecast UTC offset: %d", forecastData->timeZoneOffset);
 
 
 	//start parsing forecast

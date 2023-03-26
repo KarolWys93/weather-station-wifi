@@ -16,7 +16,7 @@ typedef enum
 	SYSTEM_POWER_CHARGING
 } SYSTEM_POWER_STATUS;
 
-void system_power_init(void);
+void system_powerInit(void);
 uint8_t system_isCharging(void);
 SYSTEM_POWER_STATUS system_powerStatus(void);
 uint32_t system_batteryVoltage(void);

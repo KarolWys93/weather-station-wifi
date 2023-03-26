@@ -87,12 +87,6 @@ void drawForecast(const SForecast * const forecastData)
 
 	load_forecastImg_BlackGrey(d_black, d_grey);
 
-//	Paint_SelectImage(d_grey);
-//	Paint_Clear(WHITE);
-//
-//	Paint_SelectImage(d_black);
-//	Paint_DrawBitMap(forecast_black);
-
 	Paint_SelectImage(d_black);
 
 	sprintf(textBuff, "%02d/%02d", timeObject->tm_mday, timeObject->tm_mon+1);
@@ -240,14 +234,7 @@ void drawForecast(const SForecast * const forecastData)
 
 	Paint_SelectImage(d_black);
 
-	if(!isCharging)
-	{
-		Paint_DrawRectangle(1, 1, battery*2, 2, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
-	}
-	else
-	{
-		Paint_DrawRectangle(1, 1, 200, 2, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
-	}
+	draw_battery_level_black(d_black, battery, isCharging);
 
 	save_img_BlackGrey(d_black, d_grey);
 	EPD_SendBlackAndGrey(d_black, d_grey);
@@ -300,10 +287,8 @@ void drawForecast(const SForecast * const forecastData)
 		Paint_DrawRectangle(4*(i)+31, start, 4*(i)+34, end, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
 	}
 
-	if(isCharging)
-	{
-		Paint_DrawRectangle(1, 1, 200, 2, RED, DRAW_FILL_FULL, DOT_PIXEL_1X1);
-	}
+
+	draw_battery_level_red(d_red, battery, isCharging);
 
 	save_img_Red(d_red);
 	EPD_SendRed(d_red);
