@@ -16,6 +16,7 @@ bool timeSync(uint8_t retries)
 {
 	uint8_t retryCounter = 0;
 	time_t time = 0;
+	time_t oldTime = 0;
 
 	while(retryCounter <= retries)
 	{
@@ -24,8 +25,10 @@ bool timeSync(uint8_t retries)
 		{
 			if(OLD_TIME_STAMP < time)
 			{
+				oldTime = RTC_getTime();
 				RTC_setTime(time);
-				Logger(LOG_INF, "Sync time OK %d", time);
+				Logger(LOG_INF, "Sync time %u", time);
+				RTC_calibration(oldTime, time);
 				return true;
 			}
 		}

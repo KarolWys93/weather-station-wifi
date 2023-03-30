@@ -30,6 +30,7 @@
 #define FILE_PATH_HOSTNAME			DIR_PATH_SYS"/hostname"
 #define FILE_PATH_LED_IND_FLAG		DIR_PATH_SYS"/led_ind"
 #define FILE_PATH_CONFIG_MODE_FLAG  DIR_PATH_SYS"/conf_mode"
+#define FILE_PATH_RTC_CALIBRATION   DIR_PATH_SYS"/rtc"
 
 #define FILE_PATH_FCAST_TMP         "/forecast.tmp"
 

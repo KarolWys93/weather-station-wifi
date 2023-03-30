@@ -23,9 +23,7 @@
 #include "images.h"
 #include "led.h"
 #include "button.h"
-
-#define BCKUP_REGISTER_WKUP_CNT 1
-#define BCKUP_REGISTER_LAST_ALARM 2
+#include "backup_registers.h"
 
 typedef enum system_rst_src
 {
@@ -177,6 +175,9 @@ void system_init(void)
 		system_restart(1);
 	}
 
+	//read calibrated RTC clock
+	RTC_loadCalibratedClock();
+
 	/* Read configs */
 	if(FR_OK == f_stat(FILE_PATH_LED_IND_FLAG, NULL))
 	{
@@ -259,7 +260,8 @@ void system_setWakeUpTimer(uint32_t seconds)
 	  timeAlarm += seconds;
 	  Logger(LOG_INF, "Wake-up signal in %d seconds", seconds);
 
-	  HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_ALARM, timeAlarm);
+	  HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_ALARM, (timeAlarm & 0xFFFF));
+
 	  RTC_setAlarmTime(timeAlarm);
 }
 
@@ -311,6 +313,9 @@ uint8_t system_restoreDefault(void)
 
 	//forecast settings
 	f_unlink(FILE_PATH_FORECAST_CONFIG);
+
+	//remove RTC calibration
+	f_unlink(FILE_PATH_RTC_CALIBRATION);
 
 	//led indicator
 	if(0 == result)

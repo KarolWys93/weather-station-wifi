@@ -48,6 +48,9 @@ time_t RTC_getTime(void);
 HAL_StatusTypeDef RTC_setAlarmTime(time_t time);
 time_t RTC_getAlarmTime(void);
 
+void RTC_loadCalibratedClock(void);
+void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

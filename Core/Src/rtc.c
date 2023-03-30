@@ -22,6 +22,22 @@
 
 /* USER CODE BEGIN 0 */
 
+#include "logger.h"
+#include "fatfs.h"
+#include "system_info.h"
+#include "backup_registers.h"
+#include <string.h>
+
+#define RTC_CALIBRATION_HISTORY_SIZE (4)
+
+typedef struct
+{
+	uint32_t calibratedFreq;
+	uint16_t dataReady;
+	uint16_t index;
+	uint32_t deltaArray[RTC_CALIBRATION_HISTORY_SIZE];
+} RTC_Calibration;
+
 /* USER CODE END 0 */
 
 RTC_HandleTypeDef hrtc;
@@ -116,6 +132,15 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
 }
 
 /* USER CODE BEGIN 1 */
+
+//static function prototypes
+static void defaultCalibrationData(RTC_Calibration *rtcCalibrationData);
+static void loadCalibrationData(RTC_Calibration *rtcCalibrationData);
+static void saveCalibrationData(RTC_Calibration *rtcCalibrationData);
+static HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc);
+static HAL_StatusTypeDef RTC_ExitInitMode(RTC_HandleTypeDef *hrtc);
+
+
 
 static HAL_StatusTypeDef RTC_EnterInitMode(RTC_HandleTypeDef *hrtc)
 {
@@ -246,5 +271,130 @@ time_t RTC_getAlarmTime(void)
 	  return (((uint32_t) high1 << 16U) | low);
 }
 
+
+
+static void defaultCalibrationData(RTC_Calibration *rtcCalibrationData)
+{
+	memset(rtcCalibrationData, 0, sizeof(RTC_Calibration));
+	rtcCalibrationData->calibratedFreq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_RTC);
+}
+
+static void loadCalibrationData(RTC_Calibration *rtcCalibrationData)
+{
+	FIL calibrationDataFile;
+	FRESULT result;
+	UINT br = 0;
+
+	if(FR_OK == f_open(&calibrationDataFile, FILE_PATH_RTC_CALIBRATION, FA_READ))
+	{
+		result = f_read(&calibrationDataFile, rtcCalibrationData, sizeof(RTC_Calibration), &br);
+		f_close(&calibrationDataFile);
+		if(result == FR_OK && br == sizeof(RTC_Calibration))
+		{
+				return;	//OK
+		}
+	}
+	defaultCalibrationData(rtcCalibrationData);
+}
+
+static void saveCalibrationData(RTC_Calibration *rtcCalibrationData)
+{
+	FIL calibrationDataFile;
+	UINT bw = 0;
+
+	if(FR_OK == f_open(&calibrationDataFile, FILE_PATH_RTC_CALIBRATION, FA_CREATE_ALWAYS | FA_WRITE))
+	{
+		f_write(&calibrationDataFile, rtcCalibrationData, sizeof(RTC_Calibration), &bw);
+		f_close(&calibrationDataFile);
+	}
+}
+
+void RTC_loadCalibratedClock(void)
+{
+	RTC_Calibration rtcSyncData;
+	uint32_t prescaler;
+
+	loadCalibrationData(&rtcSyncData);
+	prescaler = rtcSyncData.calibratedFreq - 1;
+
+	if (RTC_EnterInitMode(&hrtc) == HAL_OK)
+	{
+	    MODIFY_REG(hrtc.Instance->PRLH, RTC_PRLH_PRL, (prescaler >> 16U));
+	    MODIFY_REG(hrtc.Instance->PRLL, RTC_PRLL_PRL, (prescaler & RTC_PRLL_PRL));
+
+	    RTC_ExitInitMode(&hrtc);
+	}
+	Logger(LOG_DBG, "RTC clock: %u Hz", rtcSyncData.calibratedFreq);
+}
+
+void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync)
+{
+	RTC_Calibration rtcSyncData;
+	uint32_t lastSyncTime = 0;
+	int32_t deltaTime = 0;
+	int32_t meanDelta = 0;
+	uint32_t newFrequency = 0;
+
+	lastSyncTime = (HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_SYNC_H) << 16U);
+	lastSyncTime = lastSyncTime | HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_SYNC_L);
+
+	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_SYNC_H, (timeAfterSync >> 16U));
+	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_SYNC_L, (timeAfterSync & 0xFFFF));
+
+	if(lastSyncTime == 0 || (timeBeforeSync-lastSyncTime) < 30*60)			//no last sync or earlier than 30 minutes
+		return;
+
+	deltaTime = timeAfterSync - timeBeforeSync;
+	deltaTime = (3600 * deltaTime) / (timeBeforeSync-lastSyncTime);	//normalize delta
+
+	loadCalibrationData(&rtcSyncData);
+	rtcSyncData.deltaArray[rtcSyncData.index++] = deltaTime;
+
+	Logger(LOG_DBG, "RTC delta %u: %d", rtcSyncData.index, deltaTime);
+
+	if(rtcSyncData.index >= RTC_CALIBRATION_HISTORY_SIZE)
+	{
+		rtcSyncData.index = 0;
+		rtcSyncData.dataReady = 1;
+	}
+
+	if(!rtcSyncData.dataReady)	//not enough samples
+	{
+		saveCalibrationData(&rtcSyncData);
+		return;
+	}
+
+	for(uint32_t i = 0; i < RTC_CALIBRATION_HISTORY_SIZE; i++)
+	{
+		meanDelta += rtcSyncData.deltaArray[i];
+	}
+
+	meanDelta /= RTC_CALIBRATION_HISTORY_SIZE;
+
+	Logger(LOG_INF, "RTC error %d s", meanDelta);
+	if(meanDelta > -36 && meanDelta < 36)					//error smaller than 1%, calibration not needed
+	{
+		saveCalibrationData(&rtcSyncData);
+		return;
+	}
+
+	rtcSyncData.index = 0;
+	rtcSyncData.dataReady = 0;
+
+	newFrequency = (rtcSyncData.calibratedFreq * (3600 - meanDelta))/3600;
+	rtcSyncData.calibratedFreq = newFrequency;
+
+	Logger(LOG_INF, "RTC new clock %u Hz", newFrequency);
+	saveCalibrationData(&rtcSyncData);
+
+	newFrequency -= 1;
+	if (RTC_EnterInitMode(&hrtc) == HAL_OK)
+	{
+	    MODIFY_REG(hrtc.Instance->PRLH, RTC_PRLH_PRL, (newFrequency >> 16U));
+	    MODIFY_REG(hrtc.Instance->PRLL, RTC_PRLL_PRL, (newFrequency & RTC_PRLL_PRL));
+
+	    RTC_ExitInitMode(&hrtc);
+	}
+}
 
 /* USER CODE END 1 */
