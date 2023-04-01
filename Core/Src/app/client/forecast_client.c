@@ -28,6 +28,8 @@
 
 #include "led.h"
 
+#include "sw_watchdog.h"
+
 #define RETRY_TIME 5 //min
 
 typedef struct SForecastConfig
@@ -52,6 +54,8 @@ void runForecastApp(void)
 	uint8_t result = 0;
     SForecastConfig forecastConf;
     SForecast forecast;
+
+    sw_watchdog_reset();
 
 	if(!waitForConnection(10))
 	{
@@ -127,6 +131,8 @@ void runForecastApp(void)
     	}
     	return;
     }
+
+    sw_watchdog_reset();
 
     //forecast parsing
     result = parseForecast(FILE_PATH_FCAST_TMP, &forecast);

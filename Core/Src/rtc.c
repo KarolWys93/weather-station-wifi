@@ -324,7 +324,7 @@ void RTC_loadCalibratedClock(void)
 
 	    RTC_ExitInitMode(&hrtc);
 	}
-	Logger(LOG_DBG, "RTC clock: %u Hz", rtcSyncData.calibratedFreq);
+	Logger(LOG_INF, "RTC clock: %u Hz", rtcSyncData.calibratedFreq);
 }
 
 void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync)

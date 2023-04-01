@@ -11,7 +11,7 @@
 #include <string.h>
 #include "main.h"
 #include "rtc.h"
-
+#include "sw_watchdog.h"
 
 #include "wifi/wifi_esp.h"
 
@@ -30,6 +30,7 @@ typedef enum system_rst_src
 	SYSTEM_PWR_RST = 0,
 	SYSTEM_WAKEUP_RST,
 	SYSTEM_ALARM_RST,
+	SYSTEM_WATCHDOG_RST,
 	SYSTEM_UNKNOWN_RST
 } system_rst_src;
 
@@ -87,7 +88,12 @@ void system_init(void)
 		}
 	}
 
-	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+	if(sw_watchdog_isResetCause())
+	{
+		systemConfig.resetSrc = SYSTEM_WATCHDOG_RST;
+		led_setColor(LED_YELLOW);
+	}
+	else if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
 	{
 		uint32_t lastAlarmTime = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_ALARM);
 
@@ -143,6 +149,10 @@ void system_init(void)
 	{
 		Logger(LOG_WRN, "Unknown reset cause");
 	}
+	else if (SYSTEM_WATCHDOG_RST == systemConfig.resetSrc)
+	{
+		Logger(LOG_WRN, "Reset by watchdog!");
+	}
 
 	#ifdef DEBUG
 	Logger_setMinLevel(LOG_DBG);
@@ -167,10 +177,14 @@ void system_init(void)
 		}
 	}
 
+	sw_watchdog_enable(60000); //60 seconds
+
 	/* Check if config & system directories exist */
 	if(FR_NO_FILE == f_stat(DIR_PATH_SYS, NULL) || FR_NO_FILE == f_stat(DIR_PATH_CONF, NULL))
 	{
+		led_setColor(LED_CYAN);
 		Logger(LOG_VIP, "Required directories not found! Restoring...");
+		system_sleep(500);
 		system_restoreDefault();
 		system_restart(1);
 	}

@@ -23,6 +23,7 @@
 #include "fatfs.h"
 #include "rtc.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -41,6 +42,7 @@
 
 #include "led.h"
 #include "images.h"
+#include "sw_watchdog.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -192,6 +194,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   MX_SPI1_Init();
+  MX_TIM4_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -253,6 +257,7 @@ int main(void)
   //start applications
   if(system_isConfigModeOn())
   {
+	  sw_watchdog_reset();
 	  f_unlink(FILE_PATH_CONFIG_MODE_FLAG);
 
 	  if(WIFI_RESP_OK == loadWiFiAPConfig())
@@ -278,6 +283,7 @@ int main(void)
 	  runForecastApp();
   }
 
+  sw_watchdog_reset();
   system_shutdown();	//set system in standby mode
 
   while (1)

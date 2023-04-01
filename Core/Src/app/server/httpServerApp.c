@@ -21,6 +21,8 @@
 
 #include "images.h"
 
+#include "sw_watchdog.h"
+
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -460,6 +462,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 	g_serverRun = true;
 	while(g_serverRun)
 	{
+		sw_watchdog_reset();
 		//every 1 second
 		if(HAL_GetTick() - tickTime > 1000)
 		{
