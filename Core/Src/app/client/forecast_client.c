@@ -30,7 +30,9 @@
 
 #include "sw_watchdog.h"
 
-#define RETRY_TIME 5 //min
+#include "backup_registers.h"
+
+uint8_t retryTimeTable[] = {5, 5, 10, 15, 30, 60};	//minutes
 
 typedef struct SForecastConfig
 {
@@ -42,10 +44,26 @@ typedef struct SForecastConfig
 	char    country[3];
 } SForecastConfig;
 
+static uint8_t getRetryTime(void);
 static uint8_t readForecastConfig(SForecastConfig* forecastConfig);
 static int16_t sendGetRequest(char* host, uint16_t port, char* path, char* dataBuff, uint16_t dataBuffSize);
 static uint8_t geolocationRequest(SForecastConfig *forecastConfig);
 static uint8_t forecastRequest(SForecastConfig* forecastConfig);
+
+static uint8_t getRetryTime(void)
+{
+	const uint8_t retryTimeTableSize = sizeof(retryTimeTable)/sizeof(retryTimeTable[0]);
+	uint8_t retryTimeVal = 0;
+	uint16_t retryCnt = BCKUP_getRetryCnt();
+
+	if(retryCnt >= retryTimeTableSize)
+	{
+		retryCnt = retryTimeTableSize - 1;
+	}
+	retryTimeVal = retryTimeTable[retryCnt++];
+	BCKUP_setRetryCnt(retryCnt);
+	return retryTimeVal;
+}
 
 void runForecastApp(void)
 {
@@ -60,7 +78,7 @@ void runForecastApp(void)
 	if(!waitForConnection(10))
 	{
 		Logger(LOG_WRN, "Cannot connect to WiFi");
-		system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+		system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
 		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_WIFI, "NO WIFI");
 		return;
@@ -71,7 +89,7 @@ void runForecastApp(void)
 	if(OLD_TIME_STAMP >= RTC_getTime())
 	{
 		Logger(LOG_ERR, "time failed!");
-		system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+		system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
 		led_setColor(LED_RED);
 		show_error_image(ERR_IMG_GENERAL, "Time error");
 		return;
@@ -98,7 +116,7 @@ void runForecastApp(void)
 			{
 				led_setColor(LED_RED);
 				show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
-				system_setWakeUpTimer(RETRY_TIME * 60);  //restart after 5 minuts
+				system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
 			}
 			else
 			{
@@ -122,7 +140,7 @@ void runForecastApp(void)
     	{
     		led_setColor(LED_RED);
     		show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
-    		system_setWakeUpTimer(RETRY_TIME * 60);
+    		system_setWakeUpTimer(getRetryTime() * 60);
     	}
     	else
     	{
@@ -158,6 +176,8 @@ void runForecastApp(void)
     {
     	system_setWakeUpTimer(forecastConf.updatePeriod * 60 * 60);
     }
+
+    BCKUP_setRetryCnt(0);
 }
 
 static uint8_t forecastRequest(SForecastConfig* forecastConfig)

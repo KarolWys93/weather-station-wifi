@@ -95,7 +95,7 @@ void system_init(void)
 	}
 	else if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
 	{
-		uint32_t lastAlarmTime = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_ALARM);
+		uint32_t lastAlarmTime = BCKUP_getLastAlarm();
 
 		/* Clear standby flag */
 		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
@@ -114,12 +114,12 @@ void system_init(void)
 			systemConfig.resetSrc = SYSTEM_UNKNOWN_RST;
 		}
 
-		systemConfig.wakeUpCounter = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_WKUP_CNT);
+		systemConfig.wakeUpCounter = BCKUP_getWkupCnt();
 
 		systemConfig.wakeUpCounter++;
 	}
 
-	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_WKUP_CNT, systemConfig.wakeUpCounter);
+	BCKUP_setWkupCnt(systemConfig.wakeUpCounter);
 
 	if(__HAL_PWR_GET_FLAG(PWR_CSR_EWUP) == RESET)
 	{
@@ -274,7 +274,7 @@ void system_setWakeUpTimer(uint32_t seconds)
 	  timeAlarm += seconds;
 	  Logger(LOG_INF, "Wake-up signal in %d seconds", seconds);
 
-	  HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_ALARM, (timeAlarm & 0xFFFF));
+	  BCKUP_setLastAlarm(timeAlarm);
 
 	  RTC_setAlarmTime(timeAlarm);
 }

@@ -13,6 +13,8 @@
 #define watchdogTimer htim4
 #define prescalerTimer htim3
 
+#define WD_FREEZE_UNDER_DEBUG_SESSION() __HAL_DBGMCU_FREEZE_TIM4()
+
 static uint8_t watchdogIsRunning = 0;
 
 /**
@@ -37,6 +39,10 @@ void sw_watchdog_enable(uint16_t time_ms)
 
 	Logger(LOG_DBG, "Watchdog start %u", wd_time);
 
+#ifdef DEBUG
+	WD_FREEZE_UNDER_DEBUG_SESSION();
+#endif
+
 #if defined prescalerTimer
 	HAL_TIM_GenerateEvent(&prescalerTimer, TIM_EVENTSOURCE_UPDATE);
 	HAL_TIM_Base_Start(&prescalerTimer);
@@ -49,22 +55,15 @@ inline void sw_watchdog_reset(void)
 	watchdogTimer.Instance->CNT = 0;
 }
 
-#include "led.h"
 void sw_watchdog_callback(void)
 {
-	uint16_t watchdogFlags = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_WATCHDOG_FLAG);
-	watchdogFlags |= (1<<0);
-	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_WATCHDOG_FLAG, watchdogFlags);
-
+	BCKUP_setWDFlag(1);
 	NVIC_SystemReset();
 }
 
 uint8_t sw_watchdog_isResetCause(void)
 {
-	uint16_t watchdogFlags = HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_WATCHDOG_FLAG);
-	uint16_t watchdogResetFlag = watchdogFlags & (1 << 0);
-	watchdogFlags &= ~(1<<0);
-	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_WATCHDOG_FLAG, watchdogFlags);
-
+	uint16_t watchdogResetFlag = BCKUP_getWDFlag();
+	BCKUP_setWDFlag(0);
 	return watchdogResetFlag;
 }

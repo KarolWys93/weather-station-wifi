@@ -335,11 +335,8 @@ void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync)
 	int32_t meanDelta = 0;
 	uint32_t newFrequency = 0;
 
-	lastSyncTime = (HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_SYNC_H) << 16U);
-	lastSyncTime = lastSyncTime | HAL_RTCEx_BKUPRead(NULL, BCKUP_REGISTER_LAST_SYNC_L);
-
-	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_SYNC_H, (timeAfterSync >> 16U));
-	HAL_RTCEx_BKUPWrite(NULL, BCKUP_REGISTER_LAST_SYNC_L, (timeAfterSync & 0xFFFF));
+	lastSyncTime = BCKUP_getLastSyncTime();
+	BCKUP_setLastSyncTime(timeAfterSync);
 
 	if(lastSyncTime == 0 || (timeBeforeSync-lastSyncTime) < 30*60)			//no last sync or earlier than 30 minutes
 		return;
@@ -371,7 +368,7 @@ void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync)
 
 	meanDelta /= RTC_CALIBRATION_HISTORY_SIZE;
 
-	Logger(LOG_INF, "RTC error %d s", meanDelta);
+	Logger(LOG_INF, "RTC delta %d s", meanDelta);
 	if(meanDelta > -36 && meanDelta < 36)					//error smaller than 1%, calibration not needed
 	{
 		saveCalibrationData(&rtcSyncData);
