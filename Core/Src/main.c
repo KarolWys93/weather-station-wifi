@@ -250,6 +250,13 @@ int main(void)
 	  }
   }
 
+  //If WIFI config file doesn't exist, stop connecting with old AP
+  if(FR_NO_FILE == f_stat(FILE_PATH_WIFI_CONFIG, NULL))
+  {
+	  WiFi_DisconnectStation(1000);
+	  WiFi_setStationAutoConnection(0, 1000);
+  }
+
   Logger(LOG_INF, "Set SNTP config");
   WiFi_setSNTPconfig(1, 0, 1000);
   system_sleep(1000);
