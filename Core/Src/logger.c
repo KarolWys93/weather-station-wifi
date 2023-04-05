@@ -21,7 +21,7 @@ static uint32_t lastSyncStamp;
 static uint8_t logInitialized = 0;
 static uint8_t logPaused = 0;
 
-static char buffer[LOG_MAX_LINE_SIZE+1] = "";
+static char logBuffer[LOG_MAX_LINE_SIZE+1] = "";
 
 #if LOG_FILE_ROTATION < 1
  #error "LOG_FILE_ROTATION cannot be less than 1"
@@ -156,13 +156,13 @@ void Logger(Log_Level level, char* fmt, ...)
 
 	va_list args;
 	va_start (args, fmt);
-	vsnprintf(buffer, LOG_MAX_LINE_SIZE-1, fmt, args);
+	vsnprintf(logBuffer, LOG_MAX_LINE_SIZE-1, fmt, args);
 	// perror (buffer);
 	va_end (args);
 
-	strcat(buffer, "\n");
+	strcat(logBuffer, "\n");
 #ifdef LOGGER_USE_UART
-	HAL_UART_Transmit_DMA(&LOG_UART, (uint8_t*)buffer, strlen(buffer));
+	HAL_UART_Transmit_DMA(&LOG_UART, (uint8_t*)logBuffer, strlen(logBuffer));
 #endif
 
 	if(!logInitialized || logPaused) return;
@@ -178,7 +178,7 @@ void Logger(Log_Level level, char* fmt, ...)
 			t->tm_min,
 			t->tm_sec,
 			levelStr[level],
-			buffer);
+			logBuffer);
 
 	if(HAL_GetTick() - lastSyncStamp > LOG_SYNC_TIME)
 	{
