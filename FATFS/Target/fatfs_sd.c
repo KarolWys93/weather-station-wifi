@@ -91,6 +91,9 @@ static void SD_PowerOn(void)
   /* In the Deselect state, the SPI message is transmitted to the standby state. */
   DESELECT();
 
+  HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_SET);
+  system_sleep(200);
+
   for(int i = 0; i < 10; i++)
   {
     SPI_TxByte(0xFF);
@@ -129,6 +132,7 @@ static void SD_PowerOn(void)
 Power off */
 static void SD_PowerOff(void)
 {
+  HAL_GPIO_WritePin(SD_PWR_GPIO_Port, SD_PWR_Pin, GPIO_PIN_RESET);
   PowerFlag = 0;
 }
 
