@@ -123,14 +123,14 @@ Wifi_RespStatus loadWiFiAPConfig(void)
 		{
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = apConfigStr + jsonTokens[i + 1].start;
-			memcpy(ap_config.ssid, tokenPtr, tokenSize);
+			DMA_memcpy(ap_config.ssid, tokenPtr, tokenSize);
 			i++;
 		}
 		else if(0 == jsmn_eq(apConfigStr, &jsonTokens[i], "pass"))
 		{
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = apConfigStr + jsonTokens[i + 1].start;
-			memcpy(ap_config.pass, tokenPtr, tokenSize);
+			DMA_memcpy(ap_config.pass, tokenPtr, tokenSize);
 			i++;
 		}
 		else if(0 == jsmn_eq(apConfigStr, &jsonTokens[i], "enc"))

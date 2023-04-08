@@ -17,9 +17,11 @@
 #include "system.h"
 #include "led.h"
 
+#include <string.h>
+#include "dma.h"
+
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 static uint16_t escAndCpyStr(char* to, char* from)
@@ -507,7 +509,7 @@ HTTP_STATUS serverAPI_setWiFiconfig(char* request, uint32_t reqSize)
 
 			if(size > 32) return HTTP_SERVER_BAD_REQUEST;
 
-			memcpy(ssid, tokenPtr, tokenSize);
+			DMA_memcpy(ssid, tokenPtr, tokenSize);
 			ssid[tokenSize] = '\0';
 			i++;
 		}
@@ -516,7 +518,7 @@ HTTP_STATUS serverAPI_setWiFiconfig(char* request, uint32_t reqSize)
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = requestBodyPtr + jsonTokens[i + 1].start;
 			if(tokenSize > sizeof(pass)-1) return HTTP_SERVER_BAD_REQUEST;
-			memcpy(pass, tokenPtr, tokenSize);
+			DMA_memcpy(pass, tokenPtr, tokenSize);
 			pass[tokenSize] = '\0';
 			i++;
 		}
@@ -525,7 +527,7 @@ HTTP_STATUS serverAPI_setWiFiconfig(char* request, uint32_t reqSize)
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = requestBodyPtr + jsonTokens[i + 1].start;
 			if(tokenSize > sizeof(ipAddr)-1) return HTTP_SERVER_BAD_REQUEST;
-			memcpy(ipAddr, tokenPtr, tokenSize);
+			DMA_memcpy(ipAddr, tokenPtr, tokenSize);
 			ipAddr[tokenSize] = '\0';
 			i++;
 		}
@@ -534,7 +536,7 @@ HTTP_STATUS serverAPI_setWiFiconfig(char* request, uint32_t reqSize)
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = requestBodyPtr + jsonTokens[i + 1].start;
 			if(tokenSize > sizeof(maskAddr)-1) return HTTP_SERVER_BAD_REQUEST;
-			memcpy(maskAddr, tokenPtr, tokenSize);
+			DMA_memcpy(maskAddr, tokenPtr, tokenSize);
 			maskAddr[tokenSize] = '\0';
 			i++;
 		}
@@ -543,7 +545,7 @@ HTTP_STATUS serverAPI_setWiFiconfig(char* request, uint32_t reqSize)
 			tokenSize = jsonTokens[i + 1].end - jsonTokens[i + 1].start;
 			tokenPtr = requestBodyPtr + jsonTokens[i + 1].start;
 			if(tokenSize > sizeof(gwAddr)-1) return HTTP_SERVER_BAD_REQUEST;
-			memcpy(gwAddr, tokenPtr, tokenSize);
+			DMA_memcpy(gwAddr, tokenPtr, tokenSize);
 			gwAddr[tokenSize] = '\0';
 			i++;
 		}
@@ -936,7 +938,7 @@ HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize)
 		}
 	}
 
-	memset(&fileInfo, 0, sizeof(FILINFO));
+	DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 	if(FR_OK == f_stat(LOG_PATH"/"LOG_FILE_NAME, &fileInfo))
 	{
 		fileSize_1 = fileInfo.fsize;
@@ -949,7 +951,7 @@ HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize)
 		offset_file_1 = 0;
 		toSendSize_file_2 = maxLogSize - toSendSize_file_1;
 
-		memset(&fileInfo, 0, sizeof(FILINFO));
+		DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 		if(FR_OK == f_stat(LOG_PATH"/1_"LOG_FILE_NAME, &fileInfo))
 		{
 			fileSize_2 = fileInfo.fsize;

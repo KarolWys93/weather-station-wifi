@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "fatfs.h"
 
+#include "dma.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +40,7 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
 
     uint32_t startOfJsonFileOffset = 0;
 
-    memset(forecastData, 0, sizeof(SForecast));
+    DMA_memset(forecastData, 0, sizeof(SForecast));
 
     f_status = f_open(&forecastFile, jsonFileName, FA_READ);
     if(f_status != FR_OK)

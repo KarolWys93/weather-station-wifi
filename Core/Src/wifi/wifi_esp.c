@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "dma.h"
 
 
 #define WIFI_MESSAGE_BUFFER_SIZE 64
@@ -196,7 +197,7 @@ Wifi_RespStatus WiFi_restart(uint32_t timeout)
 	HAL_GPIO_WritePin(WiFi_EN_GPIO, WiFi_EN_PIN, GPIO_PIN_SET);
 	system_sleep(1000);
 
-	memset((void*)&wifiStatus, 0, sizeof(SWiFiStatus));
+	DMA_memset((void*)&wifiStatus, 0, sizeof(SWiFiStatus));
 
 	uint32_t startTime = HAL_GetTick();
 
@@ -966,7 +967,7 @@ Wifi_RespStatus WiFi_GetAPList(SWiFiStation* stationlist, uint8_t* listSize, uin
 				}
 				uint8_t ssidSize = endOfssid-message;
 
-				memcpy(stationInfo->ssid, message, ssidSize);
+				DMA_memcpy(stationInfo->ssid, message, ssidSize);
 				stationInfo->ssid[ssidSize] = '\0';
 
 				message += (ssidSize + 2);
@@ -1037,7 +1038,7 @@ Wifi_RespStatus WiFi_getIPAddress(char* ip, uint32_t timeout)
 				message = (message + 12);
 				char* endPtr = strchr(message, '"');
 				if(NULL == endPtr) return WIFI_RESP_ERROR;
-				memcpy(ip, message, endPtr - message);
+				DMA_memcpy(ip, message, endPtr - message);
 				ip[endPtr - message] = '\0';
 				flag = true;
 			}

@@ -23,6 +23,8 @@
 
 #include "sw_watchdog.h"
 
+#include "dma.h"
+
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -52,7 +54,7 @@ static HTTP_STATUS mrSandMan(uint8_t fast)
 	uint32_t headerSize = 0;
 	char responseBuffer[HTTP_SERVER_RESPONSE_SIZE];
 
-	memset(&fileInfo, 0, sizeof(FILINFO));
+	DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 
 	if(FR_OK == f_stat(popFile, &fileInfo))
 	{
@@ -91,7 +93,7 @@ static HTTP_STATUS errorResponse(uint16_t errorCode)
 
 	Logger(LOG_WRN, "Response %d", errorCode);
 
-	memset(&fileInfo, 0, sizeof(FILINFO));
+	DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 
 	sprintf(filePath, "%s/%d.html", HTTP_SERVER_STATIC_PATH, errorCode);
 
@@ -143,7 +145,7 @@ static HTTP_STATUS staticFileRequest(char* requestPtr, uint16_t requestSize, cha
 	char filePath[HTTP_SERVER_REQUEST_PATH_MAX_SIZE + HTTP_SERVER_STATIC_PATH_LEN];
 	char* payloadPtr;
 
-	memset(&fileInfo, 0, sizeof(FILINFO));
+	DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 
 	if(0 == strcmp("/", path))
 	{

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <http_requests.h>
+#include "dma.h"
 
 HTTP_METHOD HTTP_getMethod(char* requestPtr, uint32_t size)
 {
@@ -60,7 +61,7 @@ int16_t HTTP_getURLParams(char* requestPtr, uint32_t req_size, char* params, uin
 		return -3;
 	}
 
-	memcpy(params, paramsStartPtr, paramsSize);
+	DMA_memcpy(params, paramsStartPtr, paramsSize);
 	*(params+paramsSize) = '\0';
 	return paramsSize;
 
@@ -104,7 +105,7 @@ int16_t HTTP_getPath(char* requestPtr, uint32_t req_size, char* path, uint32_t p
 		return -3;
 	}
 
-	memcpy(path, pathStartPtr, pathSize);
+	DMA_memcpy(path, pathStartPtr, pathSize);
 	*(path+pathSize) = '\0';
 	return pathSize;
 }
@@ -134,12 +135,12 @@ int16_t HTTP_getHeaderField(char* requestPtr, uint32_t req_size, char* headerFie
 			valueSize = requestPtr - startValPtr;
 			if(valueBuffSize <= valueSize)
 			{
-				memcpy(headerValue, startValPtr, valueBuffSize-1);
+			    DMA_memcpy(headerValue, startValPtr, valueBuffSize-1);
 				*(headerValue + (valueBuffSize-1)) = '\0';
 			}
 			else
 			{
-				memcpy(headerValue, startValPtr, valueSize);
+			    DMA_memcpy(headerValue, startValPtr, valueSize);
 				*(headerValue + valueSize) = '\0';
 			}
 

@@ -49,7 +49,7 @@
 #include "Config/Debug.h"
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h> //memset()
+#include "dma.h"
 #include <math.h>
 
 PAINT Paint;
@@ -589,5 +589,5 @@ info:
 ******************************************************************************/
 void Paint_DrawBitMap(const unsigned char* image_buffer)
 {
-    memcpy(Paint.Image, image_buffer, (Paint.WidthByte*Paint.HeightByte -1));
+    DMA_memcpy(Paint.Image, (void *)image_buffer, (Paint.WidthByte*Paint.HeightByte -1));
 }

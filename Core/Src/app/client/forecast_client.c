@@ -25,7 +25,7 @@
 
 #include "forecast_drawer.h"
 #include "system.h"
-
+#include "dma.h"
 #include "led.h"
 
 #include "sw_watchdog.h"
@@ -383,7 +383,7 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
 	if(tokenPtr == NULL){return 2;}
 	tokenSize = tokenPtr->end - tokenPtr->start;
 	if(tokenSize < 1 && tokenSize > 10){return 2;}
-	memcpy(forecastConfig->lat, msgPayload + tokenPtr->start, tokenSize);
+	DMA_memcpy(forecastConfig->lat, msgPayload + tokenPtr->start, tokenSize);
 	forecastConfig->lat[tokenSize] = '\0';
 
 	// W - E
@@ -391,7 +391,7 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
 	if(tokenPtr == NULL){return 2;}
 	tokenSize = tokenPtr->end - tokenPtr->start;
 	if(tokenSize < 1 && tokenSize > 10){return 2;}
-	memcpy(forecastConfig->lon, msgPayload + tokenPtr->start, tokenSize);
+	DMA_memcpy(forecastConfig->lon, msgPayload + tokenPtr->start, tokenSize);
 	forecastConfig->lon[tokenSize] = '\0';
 
 	return 0;
@@ -410,8 +410,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 	uint16_t tokenSize;
 	jsmntok_t* tokenPtr;
 
-    memset(forecastConfig, 0, sizeof(SForecastConfig));
-
+    DMA_memset(forecastConfig, 0, sizeof(SForecastConfig));
 
     fResult = f_open(&configFile, FILE_PATH_FORECAST_CONFIG, FA_READ);
     if(fResult != FR_OK)
@@ -449,7 +448,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 	{
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize < 1 && tokenSize > 10){return 2;}
-		memcpy(forecastConfig->lon, configJsonStr + tokenPtr->start, tokenSize);
+		DMA_memcpy(forecastConfig->lon, configJsonStr + tokenPtr->start, tokenSize);
 		forecastConfig->lon[tokenSize] = '\0';
 
 		//len
@@ -457,7 +456,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 		if(tokenPtr == NULL){return 2;}
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize < 1 && tokenSize > 10){return 2;}
-		memcpy(forecastConfig->lat, configJsonStr + tokenPtr->start, tokenSize);
+		DMA_memcpy(forecastConfig->lat, configJsonStr + tokenPtr->start, tokenSize);
 		forecastConfig->lat[tokenSize] = '\0';
 	}
 	else
@@ -467,7 +466,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 		if(tokenPtr == NULL){return 2;}
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize != 32){return 2;}
-		memcpy(forecastConfig->apiKey, configJsonStr + tokenPtr->start, tokenSize);
+		DMA_memcpy(forecastConfig->apiKey, configJsonStr + tokenPtr->start, tokenSize);
 		forecastConfig->apiKey[tokenSize] = '\0';
 
 		//zip code
@@ -475,7 +474,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 		if(tokenPtr == NULL){return 2;}
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize > 11){return 2;}
-		memcpy(forecastConfig->zipCode, configJsonStr + tokenPtr->start, tokenSize);
+		DMA_memcpy(forecastConfig->zipCode, configJsonStr + tokenPtr->start, tokenSize);
 		forecastConfig->zipCode[tokenSize] = '\0';
 
 		//country code
@@ -483,7 +482,7 @@ static uint8_t readForecastConfig(SForecastConfig* forecastConfig)
 		if(tokenPtr == NULL){return 2;}
 		tokenSize = tokenPtr->end - tokenPtr->start;
 		if(tokenSize != 2){return 2;}
-		memcpy(forecastConfig->country, configJsonStr + tokenPtr->start, tokenSize);
+		DMA_memcpy(forecastConfig->country, configJsonStr + tokenPtr->start, tokenSize);
 		forecastConfig->country[tokenSize] = '\0';
 	}
 

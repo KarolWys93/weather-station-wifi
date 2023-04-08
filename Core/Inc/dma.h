@@ -29,6 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* DMA memory to memory transfer handles -------------------------------------*/
+extern DMA_HandleTypeDef hdma_memtomem_dma1_channel2;
 
 /* USER CODE BEGIN Includes */
 
@@ -41,6 +42,9 @@ extern "C" {
 void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+
+void * DMA_memcpy(void* dstPrt, void* srcPtr, uint16_t num);
+void * DMA_memset( void * ptr, uint8_t  value, uint16_t num );
 
 /* USER CODE END Prototypes */
 

@@ -26,7 +26,7 @@
 #include "fatfs.h"
 #include "system_info.h"
 #include "backup_registers.h"
-#include <string.h>
+#include "dma.h"
 
 #define RTC_CALIBRATION_HISTORY_SIZE (4)
 
@@ -275,7 +275,7 @@ time_t RTC_getAlarmTime(void)
 
 static void defaultCalibrationData(RTC_Calibration *rtcCalibrationData)
 {
-	memset(rtcCalibrationData, 0, sizeof(RTC_Calibration));
+    DMA_memset(rtcCalibrationData, 0, sizeof(RTC_Calibration));
 	rtcCalibrationData->calibratedFreq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_RTC);
 }
 
