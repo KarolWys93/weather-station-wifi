@@ -369,7 +369,7 @@ void RTC_calibration(time_t timeBeforeSync, time_t timeAfterSync)
 	meanDelta /= RTC_CALIBRATION_HISTORY_SIZE;
 
 	Logger(LOG_INF, "RTC delta %d s", meanDelta);
-	if(meanDelta > -36 && meanDelta < 36)					//error smaller than 1%, calibration not needed
+	if(meanDelta > -3 && meanDelta < 3)					//error smaller than 0.1% (3.6s/h), calibration not needed
 	{
 		saveCalibrationData(&rtcSyncData);
 		return;
