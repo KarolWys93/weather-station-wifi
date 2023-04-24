@@ -387,7 +387,10 @@ static int32_t httpServer_sendFile2(FIL* file, char* buffer, const uint32_t buff
 
         if(!firstTime)
         {
-            WiFi_SendingComplete();
+            while(!WiFi_SendingComplete())
+            {
+                HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
+            }
         }
         firstTime = false;
 
@@ -456,14 +459,6 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
         return 1;
     }
 
-    if(!WiFi_MessageReceivingIsRunning())
-    {
-        if(WIFI_RESP_OK != WiFi_MessageReceivingStart(true))
-        {
-            return 2;
-        }
-    }
-
     lastActivityTick = HAL_GetTick();
     g_serverRun = true;
     while(g_serverRun)
@@ -476,7 +471,12 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 
             Logger_sync();
 
-            WiFi_UpdateStatus(2000);
+            if(WIFI_RESP_OK != WiFi_UpdateStatus(2000))
+            {
+                status = 2;
+                break;
+            }
+
             tickTime = HAL_GetTick();
 
             if(!timeIsSynced && wifiStatus.connectedToAP)
@@ -493,7 +493,6 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
                 exitButtonTime = 0;
             }
 
-
             //every 10 second
             if(secondCounter % 10 == 0)
             {
@@ -505,6 +504,12 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
                     break;
                 }
             }
+        }
+
+        if(WIFI_RESP_OK != WiFi_handleMessages())
+        {
+            Logger(LOG_ERR, "WiFi default handler fail!");
+            return 3;
         }
 
         volatile SWiFiLinkStatus* linkStatus = &wifiStatus.linksStatus[g_linkID];
@@ -520,7 +525,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 
                 if(HTTP_SERVER_OK != reqStatus)
                 {
-                    status = 3;
+                    status = 4;
                     break;
                 }
 

@@ -12,6 +12,8 @@
 #include "usart.h"
 #include <time.h>
 
+#include <uart_ringbuffer.h>
+
 #define SNTP_ADDRESS_1	"0.pl.pool.ntp.org"
 #define SNTP_ADDRESS_2	"0.europe.pool.ntp.org"
 #define SNTP_ADDRESS_3	"0.pool.ntp.org"
@@ -87,20 +89,20 @@ extern volatile SWiFiStatus wifiStatus;
 
 Wifi_RespStatus WiFi_restart(uint32_t timeout);
 void WiFi_shutdown(void);
-Wifi_RespStatus WiFi_MessageReceivingStart(bool loopMode);
-Wifi_RespStatus WiFi_MessageReceivingStop(void);
+
+
 Wifi_RespStatus WiFi_UpdateStatus(const uint32_t timeout);
 Wifi_RespStatus WiFi_AP_mode(SWiFi_AP_Config* ap_conf);
 Wifi_RespStatus WiFi_OpenServerSocket(uint16_t port, uint8_t maxConn, uint16_t serverTimeout, uint32_t timeout);
 Wifi_RespStatus WiFi_CloseServerSocket(uint16_t port);
-Wifi_RespStatus WiFi_HandleMessage(char* message, uint32_t size);
+Wifi_RespStatus WiFi_handleMessages(void);
+
 int32_t WiFi_ReadData(uint8_t linkID, uint8_t* data, uint16_t dataSize, uint32_t readData);
 Wifi_RespStatus WiFi_SendData(uint8_t linkID, uint8_t* data, uint16_t dataSize);
 Wifi_RespStatus WiFi_SendDataEx(uint8_t linkID, uint8_t* data, uint16_t dataSize, bool wait);
 
 int8_t WiFi_OpenTCPConnection(char * address, uint16_t port, uint16_t keepAlive);
 Wifi_RespStatus WiFi_CloseConnection(uint8_t linkID);
-bool WiFi_MessageReceivingIsRunning(void);
 Wifi_RespStatus WiFi_GetVersionString(char* versionStringPtr, uint16_t size, uint32_t timeout);
 
 Wifi_RespStatus WiFi_ConnectToStation(char* ssid, char* pass, uint8_t* connectStatus, uint32_t timeout);

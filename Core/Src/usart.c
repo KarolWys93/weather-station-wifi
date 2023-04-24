@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    usart.c
-  * @brief   This file provides code for the configuration
-  *          of the USART instances.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    usart.c
+ * @brief   This file provides code for the configuration
+ *          of the USART instances.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
@@ -25,10 +25,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-static const uint8_t newLinePattern[] = {'\r', '\n'};
-static const uint8_t patternSize = sizeof(newLinePattern);
 
-static volatile uint8_t uart_line_mode = false;
 
 /* USER CODE END 0 */
 
@@ -37,7 +34,6 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
-DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USART1 init function */
 
@@ -85,7 +81,7 @@ void MX_USART2_UART_Init(void)
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.Mode = UART_MODE_TX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart2) != HAL_OK)
@@ -205,22 +201,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     __HAL_LINKDMA(uartHandle,hdmatx,hdma_usart2_tx);
 
-    /* USART2_RX Init */
-    hdma_usart2_rx.Instance = DMA1_Channel6;
-    hdma_usart2_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_usart2_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_usart2_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_usart2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_usart2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_usart2_rx.Init.Mode = DMA_NORMAL;
-    hdma_usart2_rx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_usart2_rx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart2_rx);
-
     /* USART2 interrupt Init */
     HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
@@ -273,7 +253,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
     /* USART2 DMA DeInit */
     HAL_DMA_DeInit(uartHandle->hdmatx);
-    HAL_DMA_DeInit(uartHandle->hdmarx);
 
     /* USART2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(USART2_IRQn);
@@ -285,203 +264,42 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 /* USER CODE BEGIN 1 */
 
-uint8_t UART_isLineModeOn(void)
-{
-	return uart_line_mode;
-}
-
 HAL_StatusTypeDef UART_TransmitLine(UART_HandleTypeDef *huart, const char* text, uint32_t Timeout)
 {
-	HAL_StatusTypeDef status = HAL_UART_Transmit(huart, (uint8_t *)text, strlen(text), Timeout);
-	if(HAL_OK == status) { status = HAL_UART_Transmit(huart, (uint8_t*)newLinePattern, patternSize, Timeout); }
-	return status;
-}
+    const uint8_t newLinePattern[] = {'\r', '\n'};
+    const uint8_t patternSize = sizeof(newLinePattern);
+    const uint32_t startTime = HAL_GetTick();
 
-HAL_StatusTypeDef UART_ReceiveLine(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-{
-	uint32_t tickstart = 0U;
-	uint8_t currentChar = '\0';
-	bool newLineIsReady = false;
-	uint16_t patternCounter = 0;
+    HAL_StatusTypeDef status = HAL_UART_Transmit_DMA(huart, (uint8_t*)text, strlen(text));
 
-	if(huart->RxState != HAL_UART_STATE_READY)
-	{
-		return HAL_BUSY;
-	}
-	else
-	{
-		if ((pData == NULL) || (Size == 0U))
-	    {
-	      return  HAL_ERROR;
-	    }
+    if(HAL_OK == status)
+    {
+        status = HAL_TIMEOUT;
+        do
+        {
+            if((huart->gState == HAL_UART_STATE_READY))
+            {
+                status = HAL_UART_Transmit(huart, (uint8_t*)newLinePattern, patternSize, Timeout - (HAL_GetTick() - startTime));
+                break;
+            }
+            else
+            {
+                HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
+            }
+        }
+        while(startTime + Timeout > HAL_GetTick());
+    }
 
-	    /* Process Locked */
-	    __HAL_LOCK(huart);
-		huart->RxState = HAL_UART_STATE_BUSY_RX;
-		huart->ErrorCode = HAL_UART_ERROR_NONE;
+    if(status == HAL_TIMEOUT)
+    {
+        HAL_UART_AbortTransmitCpltCallback(huart);
+    }
 
-		huart->RxXferSize = Size;
-		huart->RxXferCount = 0;
-		huart->pRxBuffPtr = pData;
-		uart_line_mode = true;
-
-	    /* Process Unlocked */
-	    __HAL_UNLOCK(huart);
-
-	    tickstart = HAL_GetTick();
-	    currentChar = (uint8_t)(huart->Instance->DR);	//dumb read for flag clear
-	    while(false == newLineIsReady)
-	    {
-	    	//wait for char
-	    	while(!__HAL_UART_GET_FLAG(huart, UART_FLAG_RXNE))
-	    	{
-	    	    if (Timeout != HAL_MAX_DELAY)
-	    	    {
-	    	      if ((Timeout == 0U) || ((HAL_GetTick() - tickstart) > Timeout))
-	    	      {
-	    	          huart->gState  = HAL_UART_STATE_READY;
-	    	          huart->RxState = HAL_UART_STATE_READY;
-	    	          __HAL_UNLOCK(huart);
-	    	          uart_line_mode = false;
-	    	          return HAL_TIMEOUT;
-	    	      }
-	    	    }
-	    	}
-
-	    	currentChar = (uint8_t)(huart->Instance->DR);
-			*(huart->pRxBuffPtr + huart->RxXferCount) = currentChar;
-			huart->RxXferCount++;
-
-	    	patternCounter = (currentChar == newLinePattern[patternCounter])? (patternCounter + 1) : 0;
-
-	    	if(patternCounter >= patternSize)
-	    	{
-	    		newLineIsReady = true;
-	    		patternCounter = 0;
-	    		huart->RxXferCount-=(patternSize - 1);
-	    		*(huart->pRxBuffPtr + (huart->RxXferCount - 1)) = '\0';
-	    	}
-
-   			if(huart->RxXferCount >= huart->RxXferSize)
-   			{
-   				newLineIsReady = true;
-	    		*(huart->pRxBuffPtr + (huart->RxXferCount - 1)) = '\0';
-	    	}
-	    }
-
-	    huart->RxState = HAL_UART_STATE_READY;
-		uart_line_mode = false;
-	}
-	return HAL_OK;
-}
-
-HAL_StatusTypeDef UART_ReceiveLine_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
-{
-	if (huart->RxState != HAL_UART_STATE_READY)
-	{
-		return HAL_BUSY;
-	}
-	else
-	{
-	    if ((pData == NULL) || (Size == 0U))
-	    {
-	      return HAL_ERROR;
-	    }
-		/* Process Locked */
-		__HAL_LOCK(huart);
-
-		huart->RxState = HAL_UART_STATE_BUSY_RX;
-		huart->ErrorCode = HAL_UART_ERROR_NONE;
-
-		huart->RxXferSize = Size;
-		huart->RxXferCount = 0;
-		huart->pRxBuffPtr = pData;
-
-		uart_line_mode = true;
-
-		/* Process Unlocked */
-		__HAL_UNLOCK(huart);
-
-		/* Remove any pending event */
-		__HAL_UART_CLEAR_NEFLAG(huart);
-		/* Enable the UART Data Register not empty Interrupt */
-		__HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
-
-		return HAL_OK;
-	}
-}
-
-__weak void UART_NewLineReceivedCallback(UART_HandleTypeDef *huart)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(huart);
-
-	/* NOTE : This function should not be modified, when the callback is needed,
-            the UART_NewLineReceivedCallback can be implemented in the user file.
-	 */
-}
-
-HAL_StatusTypeDef UART_AbortReceiveLine_IT(UART_HandleTypeDef *huart)
-{
-	/* Disable the UART Data Register not empty Interrupt */
-	__HAL_UART_DISABLE_IT(huart, UART_IT_RXNE);
-	/* Rx process is completed, restore huart->RxState to Ready */
-	huart->RxState = HAL_UART_STATE_READY;
-	uart_line_mode = false;
-	return HAL_OK;
-}
-
-void UART_LineModeIRQHandler(UART_HandleTypeDef *huart)
-{
-	uint32_t isrflags   = READ_REG(huart->Instance->SR);
-	uint32_t cr1its     = READ_REG(huart->Instance->CR1);
-
-	uint8_t currentChar = '\0';
-	bool newLineIsReady = false;
-
-	static uint16_t patternCounter = 0;
-
-	/* UART in mode Receiver -------------------------------------------------*/
-	if (((isrflags & USART_SR_RXNE) != RESET) && ((cr1its & USART_CR1_RXNEIE) != RESET))
-	{
-		currentChar = (uint8_t)(huart->Instance->DR);
-
-		*(huart->pRxBuffPtr + huart->RxXferCount) = currentChar;
-		huart->RxXferCount++;
-
-		patternCounter = (currentChar == newLinePattern[patternCounter])? (patternCounter + 1) : 0;
-		if(patternCounter >= patternSize)
-		{
-			newLineIsReady = true;
-			patternCounter = 0;
-			huart->RxXferCount-=(patternSize - 1);
-			*(huart->pRxBuffPtr + (huart->RxXferCount - 1)) = '\0';
-		}
-
-
-		if(huart->RxXferCount >= huart->RxXferSize)
-		{
-			newLineIsReady = true;
-			*(huart->pRxBuffPtr + (huart->RxXferCount - 1)) = '\0';
-		}
-
-
-		if(true == newLineIsReady)
-		{
-			/* Disable the UART Data Register not empty Interrupt */
-			__HAL_UART_DISABLE_IT(huart, UART_IT_RXNE);
-
-			/* Rx process is completed, restore huart->RxState to Ready */
-			huart->RxState = HAL_UART_STATE_READY;
-			uart_line_mode = false;
-			UART_NewLineReceivedCallback(huart);
-		}
-	}
+    return status;
 }
 
 
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-
 /**
  * @brief  Retargets the C library printf function to the USART.
  * @param  None
@@ -489,9 +307,9 @@ void UART_LineModeIRQHandler(UART_HandleTypeDef *huart)
  */
 PUTCHAR_PROTOTYPE
 {
-	while(HAL_UART_STATE_READY != HAL_UART_GetState(&huart2)) {};
-	HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+    while(HAL_UART_STATE_BUSY_TX == huart2.gState) {};    //UART busy, wait
+    HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
-	return ch;
+    return ch;
 }
 /* USER CODE END 1 */

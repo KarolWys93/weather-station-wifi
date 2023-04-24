@@ -45,13 +45,7 @@ void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
-uint8_t UART_isLineModeOn(void);
 HAL_StatusTypeDef UART_TransmitLine(UART_HandleTypeDef *huart, const char* text, uint32_t Timeout);
-HAL_StatusTypeDef UART_ReceiveLine(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-HAL_StatusTypeDef UART_ReceiveLine_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-void UART_NewLineReceivedCallback(UART_HandleTypeDef *huart);
-HAL_StatusTypeDef UART_AbortReceiveLine_IT(UART_HandleTypeDef *huart);
-void UART_LineModeIRQHandler(UART_HandleTypeDef *huart);
 
 /* USER CODE END Prototypes */
 

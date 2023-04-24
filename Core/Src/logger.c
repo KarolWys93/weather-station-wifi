@@ -151,7 +151,7 @@ void Logger(Log_Level level, char* fmt, ...)
 	}
 
 #ifdef LOGGER_USE_UART
-	while(HAL_UART_STATE_READY != HAL_UART_GetState(&LOG_UART)) {};
+	while(HAL_UART_STATE_BUSY_TX == LOG_UART.gState) {};    //UART busy, wait
 #endif
 
 	va_list args;
