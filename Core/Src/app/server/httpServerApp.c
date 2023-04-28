@@ -40,12 +40,11 @@ static uint8_t g_linkID;
 static int8_t handleRequest(char* requestPtr, uint16_t requestSize);
 static HTTP_STATUS staticFileRequest(char* requestPtr, uint16_t requestSize, char* path);
 static HTTP_STATUS errorResponse(uint16_t errorCode);
-static HTTP_STATUS mrSandMan(uint8_t fast);
+static HTTP_STATUS mrSandMan(void);
 
-static int32_t httpServer_sendFile2(FIL* file, char* buffer, const uint32_t bufferSize, const uint16_t headerSize, uint32_t data_size);
-static int32_t httpServer_sendData2(char* data, uint16_t data_size);
+static int32_t httpServer_sendDataWaitLess(char* data, uint16_t data_size);
 
-static HTTP_STATUS mrSandMan(uint8_t fast)
+static HTTP_STATUS mrSandMan(void)
 {
     const char* const popFile = "/html/vid/sandman.webm";
     FIL file;
@@ -69,14 +68,7 @@ static HTTP_STATUS mrSandMan(uint8_t fast)
 
     if(fileSize > 0 && FR_OK == f_open(&file, popFile, FA_READ))
     {
-        if(fast == 0)
-        {
-            httpServer_sendFile(&file, responseBuffer, sizeof(responseBuffer), headerSize, fileSize);
-        }
-        else
-        {
-            httpServer_sendFile2(&file, responseBuffer, sizeof(responseBuffer), headerSize, fileSize);
-        }
+        httpServer_sendFile(&file, responseBuffer, sizeof(responseBuffer), headerSize, fileSize);
     }
     f_close(&file);
     return HTTP_SERVER_OK;
@@ -270,11 +262,7 @@ static int8_t handleRequest(char* requestPtr, uint16_t requestSize)
         }
         else if(0 == strcmp(path, "/pop"))
         {
-            status = mrSandMan(0);
-        }
-        else if(0 == strcmp(path, "/pop2"))
-        {
-            status = mrSandMan(1);
+            status = mrSandMan();
         }
         else
         {
@@ -343,7 +331,7 @@ int32_t httpServer_sendData(char* data, uint16_t data_size)
     }
 }
 
-static int32_t httpServer_sendData2(char* data, uint16_t data_size)
+static int32_t httpServer_sendDataWaitLess(char* data, uint16_t data_size)
 {
     if(WIFI_RESP_OK == WiFi_SendDataEx(g_linkID, (uint8_t*)data, data_size, false))
     {
@@ -355,16 +343,16 @@ static int32_t httpServer_sendData2(char* data, uint16_t data_size)
     }
 }
 
-static int32_t httpServer_sendFile2(FIL* file, char* buffer, const uint32_t bufferSize, const uint16_t headerSize, uint32_t data_size)
+int32_t httpServer_sendFile(FIL* file, char* buffer, const uint32_t bufferSize, const uint16_t headerSize, uint32_t data_size)
 {
     char* payloadPtr = buffer + headerSize;
     uint32_t dataLeft = data_size;
     uint32_t dataToRead;
     uint32_t dataToSend = headerSize;
     uint32_t dataReadFormFile = 0;
-
-    char buffer2[bufferSize];
+    char buffer2[HTTP_SERVER_RESPONSE_SIZE];
     uint8_t bufferIndex = 0;
+
     char* bufferTab[2] = {buffer, buffer2};
 
     char* activeBuffer = bufferTab[bufferIndex];
@@ -394,7 +382,7 @@ static int32_t httpServer_sendFile2(FIL* file, char* buffer, const uint32_t buff
         }
         firstTime = false;
 
-        if(0 > httpServer_sendData2(activeBuffer, dataToSend))
+        if(0 > httpServer_sendDataWaitLess(activeBuffer, dataToSend))
         {
             return dataLeft;
         }
@@ -404,38 +392,6 @@ static int32_t httpServer_sendFile2(FIL* file, char* buffer, const uint32_t buff
         bufferIndex++;
         activeBuffer = bufferTab[bufferIndex%2];
         payloadPtr = activeBuffer;
-    }
-    return dataLeft;
-}
-
-int32_t httpServer_sendFile(FIL* file, char* buffer, const uint32_t bufferSize, const uint16_t headerSize, uint32_t data_size)
-{
-    char* payloadPtr = buffer + headerSize;
-    uint32_t dataLeft = data_size;
-    uint32_t dataToRead;
-    uint32_t dataToSend = headerSize;
-    uint32_t dataReadFormFile = 0;
-
-    while(dataLeft > 0)
-    {
-        dataToRead = dataLeft;
-        if(dataToSend + dataToRead > bufferSize)
-        {
-            dataToRead = bufferSize - dataToSend;
-        }
-
-        if((FR_OK != f_read(file, (void*)payloadPtr, dataToRead, (UINT*)&dataReadFormFile)) || (dataReadFormFile != dataToRead))
-        {
-            return dataLeft;
-        }
-        dataToSend += dataReadFormFile;
-        if(0 > httpServer_sendData(buffer, dataToSend))
-        {
-            return dataLeft;
-        }
-        dataLeft-=dataReadFormFile;
-        dataToSend = 0;
-        payloadPtr = buffer;
     }
     return dataLeft;
 }
@@ -471,11 +427,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 
             Logger_sync();
 
-            if(WIFI_RESP_OK != WiFi_UpdateStatus(2000))
-            {
-                status = 2;
-                break;
-            }
+            WiFi_UpdateStatus(2000);
 
             tickTime = HAL_GetTick();
 
@@ -506,12 +458,6 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
             }
         }
 
-        if(WIFI_RESP_OK != WiFi_handleMessages())
-        {
-            Logger(LOG_ERR, "WiFi default handler fail!");
-            return 3;
-        }
-
         volatile SWiFiLinkStatus* linkStatus = &wifiStatus.linksStatus[g_linkID];
 
         if(linkStatus->connected && (linkStatus->dataWaiting > 0))
@@ -539,6 +485,12 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
         }
 
         g_linkID = (g_linkID+1)%5;
+
+        if(WIFI_RESP_OK != WiFi_handleMessages())
+        {
+            Logger(LOG_ERR, "WiFi default handler fail!");
+            return 3;
+        }
 
         if(HAL_GetTick() - lastActivityTick > HTTP_SERVER_INACTIVITY_TIMEOUT)
         {
