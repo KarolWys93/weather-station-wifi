@@ -899,15 +899,6 @@ HTTP_STATUS serverAPI_restoreDefaultSettings(char* request, uint32_t reqSize)
     }
 }
 
-HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize)
-{
-    char responseBuff[256];
-
-    sprintf(responseBuff, "{\"voltage\":\"%lu\",\"bat_lvl\":%u,\"bat_chr\":%u}", system_batteryVoltage(), system_batteryLevel(), system_powerStatus());
-
-    return sendResponse(200, responseBuff, strlen(responseBuff));
-}
-
 HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize)
 {
     FIL file;
@@ -1016,6 +1007,17 @@ HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize)
     return HTTP_SERVER_OK;
 }
 
+//test api
+
+HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize)
+{
+    char responseBuff[256];
+
+    sprintf(responseBuff, "{\"voltage\":\"%lu\",\"bat_lvl\":%u,\"bat_chr\":%u}", system_batteryVoltage(), system_batteryLevel(), system_powerStatus());
+
+    return sendResponse(200, responseBuff, strlen(responseBuff));
+}
+
 HTTP_STATUS serverAPI_ledTest(char* request, uint32_t reqSize)
 {
     HTTP_STATUS status = sendResponse(204, NULL, 0);
@@ -1036,4 +1038,45 @@ HTTP_STATUS serverAPI_ledTest(char* request, uint32_t reqSize)
     }
 
     return status;
+}
+
+#include "images.h"
+HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize)
+{
+    char params[10];
+    int16_t paramsSize = 0;
+    uint16_t img_num = 2;
+
+    if(0 < (paramsSize = HTTP_getURLParams(request, reqSize, params, sizeof(params))))
+    {
+        if(paramsSize > 4 && 0 == strncmp(params, "img=", 4))
+        {
+            img_num = atoi(params+4);
+        }
+    }
+
+    switch (img_num) {
+        case 0:
+            show_error_image(ERR_IMG_MEMORY_CARD, "Memory Error");
+            break;
+        case 1:
+            show_emptyForecast_image();
+            break;
+        case 2:
+            show_configMode_image();
+            break;
+        case 3:
+            show_low_bat_image();
+            break;
+        case 4:
+            show_error_image(ERR_IMG_WIFI, "WIFI Error");
+            break;
+        case 5:
+            show_error_image(ERR_IMG_GENERAL, "General Error");
+            break;
+        default:
+            return sendResponse(400, NULL, 0);
+    }
+
+    return sendResponse(204, NULL, 0);
 }

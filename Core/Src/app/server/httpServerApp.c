@@ -260,6 +260,10 @@ static int8_t handleRequest(char* requestPtr, uint16_t requestSize)
         {
             status = serverAPI_ledTest(requestPtr, requestSize);
         }
+        else if(0 == strcmp(path, "/api/img_test"))
+        {
+            status = serverAPI_imgTest(requestPtr, requestSize);
+        }
         else if(0 == strcmp(path, "/pop"))
         {
             status = mrSandMan();

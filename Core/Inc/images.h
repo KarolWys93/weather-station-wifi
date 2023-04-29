@@ -19,6 +19,7 @@ typedef enum ERR_IMAGE
 
 void load_forecastImg_BlackGrey(uint8_t* black_buff, uint8_t* grey_buff);
 void load_forecastImg_Red(uint8_t* red_buff);
+void show_emptyForecast_image(void);
 
 void save_img_BlackGrey(uint8_t* black_buff, uint8_t* grey_buff);
 void save_img_Red(uint8_t* red_buff);

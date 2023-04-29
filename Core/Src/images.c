@@ -175,6 +175,24 @@ void load_forecastImg_Red(uint8_t* red_buff)
 	img_loadRed(FORECAST_BG_IMG, red_buff);
 }
 
+void show_emptyForecast_image(void)
+{
+    uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
+    uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
+    uint8_t *d_red = d_black;
+
+    Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
+    Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
+
+    load_forecastImg_BlackGrey(d_black, d_grey);
+    EPD_SendBlackAndGrey(d_black, d_grey);
+
+    load_forecastImg_Red(d_red);
+    EPD_SendRed(d_red);
+
+    EPD_Refresh();
+}
+
 void save_img_BlackGrey(uint8_t* black_buff, uint8_t* grey_buff)
 {
     #ifdef DEBUG

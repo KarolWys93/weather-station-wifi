@@ -25,9 +25,10 @@ HTTP_STATUS serverAPI_restartDevice(char* request, uint32_t reqSize, uint8_t con
 HTTP_STATUS serverAPI_restoreDefaultSettings(char* request, uint32_t reqSize);
 
 //test&debug API
-HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize);
 HTTP_STATUS serverAPI_logs(char* request, uint32_t reqSize);
+HTTP_STATUS serverAPI_voltage(char* request, uint32_t reqSize);
 HTTP_STATUS serverAPI_ledTest(char* request, uint32_t reqSize);
+HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize);
 
 
 #endif /* HTTPSERVER_API_H_ */
