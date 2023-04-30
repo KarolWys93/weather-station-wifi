@@ -49,6 +49,37 @@ static uint16_t escAndCpyStr(char* to, char* from)
     return charCounter;
 }
 
+static uint16_t uri_encode (const char *src, const size_t len, char *dst)
+{
+    char code[] = "0x00";
+    uint16_t i;
+
+    for(i = 0; i < len; i++)
+    {
+        if(*src == '\0')
+        {
+            *(dst++) = '\0';
+            break;
+        }
+        else if(*src == '%')
+        {
+            char value = 0;
+            code[2] = *(src+1);
+            code[3] = *(src+2);
+            value = strtol(code, NULL, 16);
+            *dst = value;
+            src += 3;
+            dst++;
+
+        }
+        else
+        {
+            *(dst++) = *(src++);
+        }
+    }
+    return i;
+}
+
 static uint16_t escStrnLen(char* str, uint16_t strMaxSize)
 {
     uint16_t charCounter = 0;
@@ -1043,21 +1074,67 @@ HTTP_STATUS serverAPI_ledTest(char* request, uint32_t reqSize)
 #include "images.h"
 HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize)
 {
-    char params[10];
+    char params[90];
     int16_t paramsSize = 0;
     uint16_t img_num = 2;
+    char text[40] = "";
+    char subText[50] = "";
 
     if(0 < (paramsSize = HTTP_getURLParams(request, reqSize, params, sizeof(params))))
     {
-        if(paramsSize > 4 && 0 == strncmp(params, "img=", 4))
+        char *paramKey = params;
+
+        while(paramKey < params + paramsSize)
         {
-            img_num = atoi(params+4);
+            if(0 == strncmp(paramKey, "img=", 4))
+            {
+                img_num = atoi(paramKey+4);
+            }
+            else if(0 == strncmp(paramKey, "text=", 5))
+            {
+                paramKey += 5;
+                char* valuePtr = text;
+                char* maxValuePtr = text + sizeof(text);
+
+                while(paramKey < params + paramsSize)
+                {
+                    if(*paramKey == '&' || valuePtr >= maxValuePtr - 1)
+                    {
+                        break;
+                    }
+                    *valuePtr++ = *paramKey++;
+                }
+                *valuePtr = '\0';
+                uri_encode(text, strlen(text), text);
+            }
+
+            else if(0 == strncmp(paramKey, "sub_text=", 9))
+            {
+                paramKey += 9;
+                char* valuePtr = subText;
+                char* maxValuePtr = subText + sizeof(subText);
+
+                while(paramKey < params + paramsSize)
+                {
+                    if(*paramKey == '&' || valuePtr >= maxValuePtr - 1)
+                    {
+                        break;
+                    }
+                    *valuePtr++ = *paramKey++;
+                }
+                *valuePtr = '\0';
+                uri_encode(subText, strlen(subText), subText);
+            }
+
+            paramKey = memchr(paramKey, '&', paramsSize - (params - paramKey));
+            if(paramKey == NULL) break;
+            paramKey++;
         }
     }
 
     switch (img_num) {
         case 0:
-            show_error_image(ERR_IMG_MEMORY_CARD, "Memory Error");
+            show_error_image(ERR_IMG_MEMORY_CARD, text, subText);
             break;
         case 1:
             show_emptyForecast_image();
@@ -1069,10 +1146,10 @@ HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize)
             show_low_bat_image();
             break;
         case 4:
-            show_error_image(ERR_IMG_WIFI, "WIFI Error");
+            show_error_image(ERR_IMG_WIFI, text, subText);
             break;
         case 5:
-            show_error_image(ERR_IMG_GENERAL, "General Error");
+            show_error_image(ERR_IMG_GENERAL, text, subText);
             break;
         default:
             return sendResponse(400, NULL, 0);

@@ -90,7 +90,7 @@ Wifi_RespStatus loadWiFiAPConfig(void)
 	uint16_t tokenSize;
 	char* tokenPtr;
 
-	memset(&ap_config, 0, sizeof(SWiFi_AP_Config));
+	DMA_memset(&ap_config, 0, sizeof(SWiFi_AP_Config));
 
 	jsmn_init(&jsonParser);
 
@@ -235,7 +235,7 @@ int main(void)
 		  if(retryCounter > 5)
 		  {
 			  WiFi_shutdown();
-			  show_error_image(ERR_IMG_GENERAL, "WIFI error");
+			  show_error_image(ERR_IMG_GENERAL, "WIFI Module Error", NULL);
 			  for(uint8_t i = 0; i < 20; i++)
 			  {
 				  led_setColor(LED_RED);
@@ -277,12 +277,14 @@ int main(void)
 		  if(0 != (serverExitCode = runServerApp(80, 5, 1000)))
 		  {
 			  Logger(LOG_ERR, "Server exit with code %d", serverExitCode);
-			  show_error_image(ERR_IMG_GENERAL, "server fatal");
+			  char errStr[20];
+			  sprintf(errStr, "ecode: %d", serverExitCode);
+			  show_error_image(ERR_IMG_GENERAL, "Fatal Server Err", errStr);
 		  }
 	  }
 	  else
 	  {
-		  show_error_image(ERR_IMG_GENERAL, "WIFI AP error");
+		  show_error_image(ERR_IMG_GENERAL, "WIFI AP Error", "Cannot start AP");
 	  }
   }
   else

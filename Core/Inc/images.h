@@ -24,7 +24,7 @@ void show_emptyForecast_image(void);
 void save_img_BlackGrey(uint8_t* black_buff, uint8_t* grey_buff);
 void save_img_Red(uint8_t* red_buff);
 
-void show_error_image(ERR_IMAGE errImg, char* errText);
+void show_error_image(ERR_IMAGE errImg, char* errText, char* subText);
 void show_configMode_image(void);
 void show_low_bat_image(void);
 

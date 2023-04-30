@@ -80,7 +80,7 @@ void runForecastApp(void)
         Logger(LOG_WRN, "Cannot connect to WiFi");
         system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
         led_setColor(LED_RED);
-        show_error_image(ERR_IMG_WIFI, "NO WIFI");
+        show_error_image(ERR_IMG_WIFI, "No WIFI", NULL);
         return;
     }
 
@@ -91,7 +91,7 @@ void runForecastApp(void)
         Logger(LOG_ERR, "time failed!");
         system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
         led_setColor(LED_RED);
-        show_error_image(ERR_IMG_GENERAL, "Time error");
+        show_error_image(ERR_IMG_GENERAL, "Time Sync Error", NULL);
         return;
     }
 
@@ -101,7 +101,7 @@ void runForecastApp(void)
     {
         Logger(LOG_ERR, "Cannot read forecast config (%d)", result);
         led_setColor(LED_RED);
-        show_error_image(ERR_IMG_GENERAL, "forecast conf err");
+        show_error_image(ERR_IMG_GENERAL, "Config Error", "Invalid forecast config");
         return;
     }
 
@@ -112,16 +112,28 @@ void runForecastApp(void)
         if(0 != (result = geolocationRequest(&forecastConf)))
         {
             Logger(LOG_WRN, "geolocation failed: %d", result);
-            if(result == 2)
+            if(result == 3)
             {
                 led_setColor(LED_RED);
-                show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
+                show_error_image(ERR_IMG_WIFI, "Connection Error", "Geolocation request failed");
                 system_setWakeUpTimer(getRetryTime() * 60);  //restart after 5 minuts
             }
             else
             {
                 led_setColor(LED_RED);
-                show_error_image(ERR_IMG_GENERAL, "geolocation error");
+                char* errStr = NULL;
+                switch (result) {
+                    case 1:
+                        errStr = "Invalid ZIP code";
+                        break;
+                    case 2:
+                        errStr = "Invalid API key";
+                        break;
+                    case 4:
+                        errStr = "Server response error";
+                        break;
+                }
+                show_error_image(ERR_IMG_GENERAL, "Geolocation Error", errStr);
             }
             return;
         }
@@ -139,13 +151,22 @@ void runForecastApp(void)
         if(result == 1)
         {
             led_setColor(LED_RED);
-            show_error_image(ERR_IMG_WIFI, "CONNECTION ERR");
+            show_error_image(ERR_IMG_WIFI, "Connection Error", "Forecast request failed");
             system_setWakeUpTimer(getRetryTime() * 60);
         }
         else
         {
             led_setColor(LED_RED);
-            show_error_image(ERR_IMG_GENERAL, "forecast req error");
+            char* errStr = NULL;
+            switch (result) {
+                case 2:
+                    errStr = "Request error";
+                    break;
+                case 3:
+                    errStr = "Memory write error";
+                    break;
+            }
+            show_error_image(ERR_IMG_GENERAL, "Forecast Error", errStr);
         }
         return;
     }
@@ -158,7 +179,10 @@ void runForecastApp(void)
     if(result != 0)
     {
         led_setColor(LED_RED);
-        show_error_image(ERR_IMG_GENERAL, "forecast error");
+        char* errStr = NULL;
+        if(result == 1) errStr = "Memory read error";
+        if(result == 2) errStr = "Fcast parsing error";
+        show_error_image(ERR_IMG_GENERAL, "Forecast Error", errStr);
         return;
     }
 
@@ -351,7 +375,7 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
     if(dataRecLen < 0)
     {
         Logger(LOG_ERR, "Get request failed with code: %d", dataRecLen);
-        return 2;
+        return 3;
     }
 
     if(HTTP_getResponseCode(dataBuff, dataRecLen) != 200)
@@ -360,8 +384,11 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
         if(HTTP_getResponseCode(dataBuff, dataRecLen) == 404)
         {
             return 1;
+        }else if(HTTP_getResponseCode(dataBuff, dataRecLen) == 401)
+        {
+            return 2;
         }
-        return 3;
+        return 4;
     }
 
     msgSize = HTTP_getContentSize(dataBuff, dataRecLen);
@@ -373,24 +400,24 @@ static uint8_t geolocationRequest(SForecastConfig *forecastConfig)
 
     if(0 > numOfTokens || jsonTokens[0].type != JSMN_OBJECT)	//if no tokens or first token isn't object
     {
-        return 3;
+        return 4;
     }
 
     // N
     // |
     // S
     tokenPtr = jsmn_get_token("lat", msgPayload, jsonTokens, numOfTokens);
-    if(tokenPtr == NULL){return 2;}
+    if(tokenPtr == NULL){return 4;}
     tokenSize = tokenPtr->end - tokenPtr->start;
-    if(tokenSize < 1 && tokenSize > 10){return 2;}
+    if(tokenSize < 1 && tokenSize > 10){return 4;}
     DMA_memcpy(forecastConfig->lat, msgPayload + tokenPtr->start, tokenSize);
     forecastConfig->lat[tokenSize] = '\0';
 
     // W - E
     tokenPtr = jsmn_get_token("lon", msgPayload, jsonTokens, numOfTokens);
-    if(tokenPtr == NULL){return 2;}
+    if(tokenPtr == NULL){return 5;}
     tokenSize = tokenPtr->end - tokenPtr->start;
-    if(tokenSize < 1 && tokenSize > 10){return 2;}
+    if(tokenSize < 1 && tokenSize > 10){return 4;}
     DMA_memcpy(forecastConfig->lon, msgPayload + tokenPtr->start, tokenSize);
     forecastConfig->lon[tokenSize] = '\0';
 

@@ -25,6 +25,8 @@
 #include "button.h"
 #include "backup_registers.h"
 
+#include <stdio.h>
+
 typedef enum system_rst_src
 {
     SYSTEM_PWR_RST = 0,
@@ -58,7 +60,7 @@ static uint32_t startTimestamp = 0;
 
 //private functions
 static void shutdownSystem(void);
-static void cardMountFailed(void);
+static void cardMountFailed(FRESULT status);
 
 
 void system_init(void)
@@ -131,9 +133,10 @@ void system_init(void)
     system_powerInit();
 
     /* Mount SD Card */
-    if(FR_OK != f_mount(&fs, "", 1))
+    FRESULT f_status = f_mount(&fs, "", 1);
+    if(FR_OK != f_status)
     {
-        cardMountFailed();
+        cardMountFailed(f_status);
     }
     system_sleep(100);
 
@@ -386,12 +389,15 @@ static void shutdownSystem(void)
     f_mount(NULL, "", 1);
 }
 
-static void cardMountFailed(void)
+static void cardMountFailed(FRESULT status)
 {
+    char errStr[20];
     led_setColor(LED_RED);
-    Logger(LOG_VIP, "SD card err");
+    Logger(LOG_VIP, "SD card err %d", status);
     EPD_Init();
-    show_error_image(ERR_IMG_MEMORY_CARD, "SD card err");
+
+    sprintf(errStr, "Err %d", status);
+    show_error_image(ERR_IMG_MEMORY_CARD, "Memory Error", errStr);
     EPD_Sleep();
     /* Clear wakeup flag */
     __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);

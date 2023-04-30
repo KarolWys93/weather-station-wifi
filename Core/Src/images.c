@@ -232,7 +232,7 @@ void save_img_Red(uint8_t* red_buff)
     #endif
 }
 
-void show_error_image(ERR_IMAGE errImg, char* errText)
+void show_error_image(ERR_IMAGE errImg, char* errText, char* subText)
 {
 	uint16_t textSize = 0;
 	ImageName imageName;
@@ -277,6 +277,11 @@ void show_error_image(ERR_IMAGE errImg, char* errText)
 		if(textSize > 200) textSize = 200;
 		textSize = (200-textSize)/2;
 		Paint_DrawString(textSize, 140, errText, font, WHITE, BLACK);
+	}
+
+	if(subText != NULL)
+	{
+	    Paint_DrawString(0, 200-Font12.Height, subText, &Font12, WHITE, BLACK);
 	}
 
 	draw_battery_level_black(d_black, batteryLvl, isCharging);
