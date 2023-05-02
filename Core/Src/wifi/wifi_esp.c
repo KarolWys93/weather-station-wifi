@@ -202,8 +202,8 @@ static Wifi_RespStatus defaultMsgHandler(char* message, uint32_t size)
     if(asyncSend)
     {
         if(0 == strncmp(message, "SEND OK", 7)   ||
-           0 == strncmp(message, "SEND FAIL", 9) ||
-           0 == strncmp(message, "ERROR", 5))
+                0 == strncmp(message, "SEND FAIL", 9) ||
+                0 == strncmp(message, "ERROR", 5))
         {
             sendingComplete = true;
             asyncSend = false;
@@ -219,6 +219,8 @@ static inline char readChar(){
     HAL_UART_Receive(&WiFiUart, (uint8_t *)&buffer, 1, 500);
     return buffer;
 }
+
+static Wifi_RespStatus WiFi_GetMac(uint8_t AP_mode, char* macStringPtr, uint16_t size, uint32_t timeout);
 
 Wifi_RespStatus WiFi_handleMessages(void)
 {
@@ -1057,6 +1059,73 @@ Wifi_RespStatus WiFi_getSNTPtime(time_t* timeSecPtr, uint32_t timeout)
     while(startTime + timeout > HAL_GetTick());
 
     return WIFI_RESP_TIMEOUT;
+}
+
+Wifi_RespStatus WiFi_GetStationModeMac(char* macStringPtr, uint16_t size, uint32_t timeout)
+{
+    return WiFi_GetMac(0, macStringPtr, size, timeout);
+}
+
+Wifi_RespStatus WiFi_GetAPModeMac(char* macStringPtr, uint16_t size, uint32_t timeout)
+{
+    return WiFi_GetMac(1, macStringPtr, size, timeout);
+}
+
+static Wifi_RespStatus WiFi_GetMac(uint8_t AP_mode, char* macStringPtr, uint16_t size, uint32_t timeout)
+{
+    uint32_t startTime = HAL_GetTick();
+    Wifi_RespStatus status = WIFI_RESP_TIMEOUT;
+    char* message = NULL;
+    char* cmd;
+    char* resp;
+    uint8_t respTagSize;
+
+    if(AP_mode)
+    {
+        cmd = "AT+CIPAPMAC?";
+        resp = "+CIPAPMAC:\"";
+    }
+    else
+    {
+        cmd = "AT+CIPSTAMAC?";
+        resp = "+CIPSTAMAC:\"";
+    }
+    respTagSize = strlen(resp);
+
+    WiFi_handleMessages();
+
+    if(size < 18)
+    {
+        return WIFI_RESP_ERROR;
+    }
+
+    if(HAL_OK != UART_TransmitLine(&WiFiUart, cmd, 100))
+    {
+        return WIFI_RESP_ERROR;
+    }
+
+    do
+    {
+        message = getMessage();
+        if(NULL != message)
+        {
+            if(0 == strncmp(message, resp, respTagSize))
+            {
+                message += respTagSize;
+                memcpy(macStringPtr, message, 17);
+                macStringPtr[17] = '\0';
+                status = WIFI_RESP_OK;
+                break;
+            }
+        }
+        else
+        {
+            HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
+        }
+    }
+    while(startTime + timeout > HAL_GetTick());
+
+    return status;
 }
 
 bool WiFi_SendingComplete(void)

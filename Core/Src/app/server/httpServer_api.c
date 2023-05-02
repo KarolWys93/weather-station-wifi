@@ -24,6 +24,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+typedef struct SInfoCache
+{
+    char wifiVersion[20];
+    char staMac[18];
+    char apMac[18];
+} SInfoCache;
+
+
 static uint16_t escAndCpyStr(char* to, char* from)
 {
     uint16_t charCounter = 0;
@@ -163,6 +172,8 @@ static HTTP_STATUS sendResponse(uint16_t code, char* data, uint16_t dataSize)
  */
 HTTP_STATUS serverAPI_status(char* request, uint32_t reqSize)
 {
+    static SInfoCache infoCache;
+
     FIL file;
     jsmn_parser jsonParser;
     jsmntok_t jsonTokens[11];
@@ -170,15 +181,25 @@ HTTP_STATUS serverAPI_status(char* request, uint32_t reqSize)
     char configJsonStr[256];
     uint16_t configJsonSize = 0;
 
-    char response[256];
+    char response[384];
 
-    sprintf(response, "{\"wifi_stat\":%d,\"bat\":%d,\"charging\":%d,\"ver\":\"%s\",\"ver_wifi\":\"",
-            wifiStatus.connectedToAP? 1 : 0,
+    if(strlen(infoCache.wifiVersion) == 0)
+    {
+        if(WIFI_RESP_OK != WiFi_GetVersionString(infoCache.wifiVersion, sizeof(infoCache.wifiVersion), 1000)) return HTTP_SERVER_ERROR;
+        if(WIFI_RESP_OK != WiFi_GetStationModeMac(infoCache.staMac, sizeof(infoCache.staMac), 1000)) return HTTP_SERVER_ERROR;
+        if(WIFI_RESP_OK != WiFi_GetAPModeMac(infoCache.apMac, sizeof(infoCache.apMac), 1000)) return HTTP_SERVER_ERROR;
+
+    }
+
+    sprintf(response, "{\"wifi_stat\":%d,\"bat\":%d,\"charging\":%d,\"ver\":\"%s\",\"ver_wifi\":\"%s\",\"sta_mac\":\"%s\",\"ap_mac\":\"%s",
+                    wifiStatus.connectedToAP? 1 : 0,
                     system_batteryLevel(),
                     system_powerStatus(),
-                    VERSION_STR);
-
-    if(WIFI_RESP_OK != WiFi_GetVersionString(response + strlen(response), 20, 1000)) return HTTP_SERVER_ERROR;
+                    VERSION_STR,
+                    infoCache.wifiVersion,
+                    infoCache.staMac,
+                    infoCache.apMac
+    );
 
     strcat(response, "\",\"ip_addr\":\"");
     if(WIFI_RESP_OK != WiFi_getIPAddress(response + strlen(response), 1000)) return HTTP_SERVER_ERROR;

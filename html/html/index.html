@@ -46,6 +46,14 @@
 						<th>Wi-Fi module version</td>
 						<td id="wifi_version">-</td>
 					</tr>
+					<tr>
+						<th>MAC address</td>
+						<td id="sta_mac">-</td>
+					</tr>
+					<tr>
+						<th>AP MAC address</td>
+						<td id="ap_mac">-</td>
+					</tr>
 				</table>
 			</div>
 		</div>
@@ -66,6 +74,8 @@
 				$("#firm_version").text(data.ver);
 				$("#wifi_version").text(data.ver_wifi);
 				$("#ip_address").text(data.ip_addr);
+				$("#sta_mac").text(data.sta_mac);
+				$("#ap_mac").text(data.ap_mac);
 				
 				if(data.wifi_stat === 1)
 				{

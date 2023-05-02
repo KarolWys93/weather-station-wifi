@@ -5,5 +5,7 @@
 	"ip_addr": "192.168.0.129",
 	"charging": 2,
 	"ver": "v1.3.1",
+	"sta_mac": "00:11:22:33:44:55",
+	"ap_mac": "AA:BB:CC:DD:EE:FF",
 	"ver_wifi": "2.1"
 }
