@@ -82,6 +82,10 @@ void MX_DMA_Init(void)
 
 void * DMA_memcpy(void* dstPrt, void* srcPtr, uint16_t num)
 {
+    if(num == 0)
+    {
+        return dstPrt;
+    }
     MODIFY_REG(hdma_memtomem_dma1_channel2.Instance->CCR, DMA_CCR_PINC, DMA_PINC_ENABLE);
     HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel2, (uint32_t)srcPtr, (uint32_t)dstPrt, num);
     while (HAL_DMA_GetState(&hdma_memtomem_dma1_channel2) != HAL_DMA_STATE_READY)
@@ -95,6 +99,10 @@ void * DMA_memcpy(void* dstPrt, void* srcPtr, uint16_t num)
 void * DMA_memset( void * ptr, uint8_t value, uint16_t num )
 {
     uint32_t valueToCpy = value;
+    if(num == 0)
+    {
+        return ptr;
+    }
     MODIFY_REG(hdma_memtomem_dma1_channel2.Instance->CCR, DMA_CCR_PINC, DMA_PINC_DISABLE);
     HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel2, (uint32_t)(&valueToCpy), (uint32_t)ptr, num);
     while (HAL_DMA_GetState(&hdma_memtomem_dma1_channel2) != HAL_DMA_STATE_READY)
