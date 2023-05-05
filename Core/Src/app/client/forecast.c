@@ -83,7 +83,11 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
     /* time */
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"time\"", parseBuffer, PARSER_BUFF_SIZE);
 
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -93,13 +97,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"time\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* temperature_2m */
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"temperature_2m\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -110,13 +119,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"temperature_2m\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* apparent_temperature */
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"apparent_temperature\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -127,13 +141,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"apparent_temperature\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* rain */
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"rain\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -144,13 +163,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"rain\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* showers - convective rain */
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"showers\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -161,13 +185,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"showers\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* snowfall*/
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"snowfall\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -178,13 +207,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"snowfall\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* weathercode*/
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"weathercode\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -194,13 +228,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"weathercode\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* pressure_msl*/
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"pressure_msl\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -210,13 +249,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"pressure_msl\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* windspeed_10m*/
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"windspeed_10m\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -227,13 +271,18 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"windspeed_10m\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
 
     /* windgusts_10m*/
     dataPtr = getJsonArrayPtr(&forecastFile, startOfJsonFileOffset, "\"windgusts_10m\"", parseBuffer, PARSER_BUFF_SIZE);
-    if(NULL == dataPtr) return 2;
+    if(NULL == dataPtr)
+    {
+        f_close(&forecastFile);
+        return 2;
+    }
     dataPtr++;
 
     for(forecastObjCnt = 0; forecastObjCnt < FORECAST_SIZE; forecastObjCnt++)
@@ -244,6 +293,7 @@ uint8_t parseForecast(char * jsonFileName, SForecast *forecastData)
         if(dataPtr == NULL && ((forecastObjCnt + 1) != FORECAST_SIZE))
         {
             arrayEndToEarlyError("\"windgusts_10m\"", forecastObjCnt+1);
+            f_close(&forecastFile);
             return 2;
         }
     }
