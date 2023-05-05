@@ -397,6 +397,12 @@ int32_t httpServer_sendFile(FIL* file, char* buffer, const uint32_t bufferSize, 
         activeBuffer = bufferTab[bufferIndex%2];
         payloadPtr = activeBuffer;
     }
+
+    while(!WiFi_SendingComplete())
+    {
+        HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
+    }
+
     return dataLeft;
 }
 
@@ -432,6 +438,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
             Logger_sync();
 
             WiFi_UpdateStatus(2000);
+            Logger(LOG_DBG, "Link status updated");
 
             tickTime = HAL_GetTick();
 
@@ -466,6 +473,7 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
 
         if(linkStatus->connected && (linkStatus->dataWaiting > 0))
         {
+            Logger(LOG_DBG, "Link %d incoming %d", g_linkID, linkStatus->dataWaiting);
             int16_t rcvLen = WiFi_ReadData(g_linkID, (uint8_t*) requestBuffer, linkStatus->dataWaiting, 1000);
             Logger(LOG_INF, "Link %d received %d bytes", g_linkID, rcvLen);
             if(rcvLen > 0)

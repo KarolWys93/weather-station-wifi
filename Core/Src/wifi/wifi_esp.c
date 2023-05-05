@@ -464,14 +464,14 @@ int32_t WiFi_ReadData(uint8_t linkID, uint8_t* data, uint16_t dataSize, uint32_t
             charCounter++;
             if(charCounter > 6){
                 messageReceivingStart();
-                return -1;
+                return -3;
             }
         }
     }
     else
     {
         messageReceivingStart();
-        return -1;
+        return -2;
     }
 
     //receive data
@@ -483,7 +483,7 @@ int32_t WiFi_ReadData(uint8_t linkID, uint8_t* data, uint16_t dataSize, uint32_t
         {
             HAL_UART_AbortReceive(&WiFiUart);
             messageReceivingStart();
-            return -1;
+            return -4;
         }
         HAL_PWR_EnterSLEEPMode(0, PWR_SLEEPENTRY_WFI);
     }

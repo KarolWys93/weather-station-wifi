@@ -292,7 +292,7 @@ HAL_StatusTypeDef UART_TransmitLine(UART_HandleTypeDef *huart, const char* text,
 
     if(status == HAL_TIMEOUT)
     {
-        HAL_UART_AbortTransmitCpltCallback(huart);
+        HAL_UART_AbortTransmit(huart);
     }
 
     return status;
