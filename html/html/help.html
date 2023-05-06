@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Weather Station - Help</title>
+<script src="/scripts/jquery-3.5.1.min.js"></script>
+<link href="/ccs/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<script>
+	$(document).ready(function(){
+		$("header").load("/header.html");
+	});
+	</script>
+	<header>
+	<div id="header"></div>
+	</header>
+	
+	<div class="container-xxl">
+		<div class="row justify-content-center">
+			<div class="col-8">
+				<h1>User manual</h1>
+				<h2>Front of the device</h2>
+				<div class="text-center"><img src="/img/front.png" alt="front view of device"></div>
+				<p><ul>
+				<li><strong>Charging indicator:</strong> Lights up when charging is in progress.</li>
+				<!--<li><strong>Status indicator:</strong> green - device is active, blue - device in config mode, red - error occurred.</li>-->
+				<li><strong>Status indicator:</strong>
+				<ul>
+					<li>green - device is active</li>
+					<li>blue - device in config mode</li>
+					<li>red - error occurred</li>
+					<li>yellow - indicates restart after hang-up condition</li>
+					<li>cyan - factory reset</li>
+					<li>white - critical error occurred. Manual restart needed</li>
+				</ul></li>
+				<li><strong>Wake-up button:</strong> Wakes the device from sleep mode. If the config mode button (blue) is pressed during wake up, the device enters setup mode.</li>
+				</ul></p>
+				<h2>Forecast display</h2>
+				<div class="text-center"><img src="/img/fcast.png" alt="example forecast display"></div>
+				<p>Legend:<ul>
+				<li><strong>A -</strong> Forecast date.</li>
+				<li><strong>B -</strong> Battery level.</li>
+				<li><strong>C -</strong> Time line. The pink line separates the 3 hour segments. The dashed line separates the days.</li>
+				<li><strong>D -</strong> Temperature in &degC. The black line is the real temperature, the red line is the apparent temperature.</li>
+				<li><strong>E -</strong> Rain (black) in mm and snowfall (red) in cm. The red square means a storm.</li>
+				<li><strong>F -</strong> Atmospheric pressure in hPa.</li>
+				<li><strong>G -</strong> Wind speed (grey) and gusts (red) in m/s.</li>
+				</ul></p>
+				<h2>Config mode</h2>
+				<p>To enter configuration mode, hold the blue button on the back of the device while waking up (top button) or turning on the power (power switch).</p>
+				<p>In config mode, the device enables its own WiFi Access Point. The default WiFi name is <strong>WeatherStation_xxxx</strong> (where xxxx is the end of the serial number) and the password is <strong>littlefox123</strong>.
+				The default WiFi name and password can be changed in the <a href="/wifi-ap.html">Access Point</a> tab.</p>
+				<p>The configuration website is available at <a href="http://192.168.4.1">http://192.168.4.1</a>.</p>
+				<h2>Factory reset</h2>
+				<p>The device can be restored to the default settings in <a href="/system.html">System</a> tab. A factory reset can also be performed by holding down the yellow button on the back of the device while switching power on.
+				After the factory reset, the device will reboot into configuration mode.</p>
+			</div>
+		</div>
+	</div>
+	<script src="/scripts/bootstrap.bundle.min.js"></script>
+</body>
+</html>

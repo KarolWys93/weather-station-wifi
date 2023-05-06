@@ -1,2 +1,2 @@
 tar -cf - --exclude 'img/scr' html/ img/ | md5sum
-7ebc50bd7ec83d8a6028d9de124f137d *-
+ded5d8f5f5945529201f645af031c3b4 *-
