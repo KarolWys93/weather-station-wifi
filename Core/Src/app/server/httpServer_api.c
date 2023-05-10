@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "images.h"
 
 typedef struct SInfoCache
 {
@@ -1092,7 +1093,6 @@ HTTP_STATUS serverAPI_ledTest(char* request, uint32_t reqSize)
     return status;
 }
 
-#include "images.h"
 HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize)
 {
     char params[90];

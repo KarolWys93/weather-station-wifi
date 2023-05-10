@@ -139,19 +139,20 @@ static HTTP_STATUS staticFileRequest(char* requestPtr, uint16_t requestSize, cha
 
     DMA_memset(&fileInfo, 0, sizeof(FILINFO));
 
-    if(0 == strcmp("/", path))
+    if('/' == path[strlen(path) - 1])   //path ends with '/' char
     {
-        sprintf(filePath, "%s/index.html", HTTP_SERVER_STATIC_PATH);
+        sprintf(filePath, "%s%sindex.html", HTTP_SERVER_STATIC_PATH, path);
     }
     else
     {
         sprintf(filePath, "%s%s", HTTP_SERVER_STATIC_PATH, path);
     }
 
-    if(FR_OK != f_stat(filePath, &fileInfo))
+    if(FR_OK != f_stat(filePath, &fileInfo) || (fileInfo.fattrib & AM_DIR))
     {
         return HTTP_SERVER_NOT_FOUND;
     }
+
     fileSize = fileInfo.fsize;
 
     if(FR_OK != f_open(&file, filePath, FA_READ))
@@ -438,7 +439,6 @@ uint8_t runServerApp(uint16_t port, uint8_t maxConnection, uint16_t serverTimeou
             Logger_sync();
 
             WiFi_UpdateStatus(2000);
-            Logger(LOG_DBG, "Link status updated");
 
             tickTime = HAL_GetTick();
 

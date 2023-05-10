@@ -17,7 +17,7 @@
 
 #define LOG_MAX_LINE_SIZE 128
 
-#define LOG_SYNC_TIME 1 * 1000    //in msec
+#define LOG_SYNC_TIME 0 * 1000    //in msec
 
 #define LOGGER_USE_UART
 

@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Weather Station - forecast</title>
+<title>Weather Station</title>
 <script src="/scripts/jquery-3.5.1.min.js"></script>
 <link href="/ccs/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 	<script>
 	$(document).ready(function(){
-		$("header").load("/header.html");
+		$("header").load("header.html");
 	});
 	</script>
 	<header>
@@ -19,24 +19,24 @@
 	<div class="container-xxl">
 		<div class="row justify-content-center">
 			<div class="col-8">
-				<h1>Forecast configuration</h1>
+				<h1>Konfiguracja prognozy</h1>
 				<div class="col-md-12">
-				<p>Here you can configure the location for which you want to receive forecasts. The location can be given by coordinates or by a postal code. Forecasts are provided thanks to <strong><a href=https://open-meteo.com/>open-meteo</a></strong>!</p>
-				<p>If you want to enter a location using a zip code, you need to get an API key for a <strong>OpenWeather</strong> geocoding service. 
-				The API key can be created after logging in to <a href=https://openweathermap.org/>openweathermap.org</a>.
-				The free plan includes the geocoding service.</p>
+				<p>Wybiesz lokalizację, dla której ma być prezentowana prognoza pogody. Lokalizacja może być podana jako współrzędne lub kod pocztowy. Prognozy pogody dostarczane są dzięki serwisowi <strong><a href=https://open-meteo.com/>open-meteo</a></strong>!</p>
+				<p>Jeśli chcesz ustalić lokalizację za pomocą kodu pocztowego, musisz najpierw uzyskać klucz API z serwisu <strong>OpenWeather</strong>. 
+				Klucz można uzyskać po zalogowaniu na stronę <a href=https://openweathermap.org/>openweathermap.org</a>.
+				Darmowy plan zawiera usługę geokodowania (zamiana kodu pocztowego na współrzędne).</p>
 				</div>
 				<div id="alert_container" style="display: none;"></div>
 				<form><fieldset class="row g-3" disabled>
 					<div class="col-6">
-						<label for="api_key" class="form-label">Geocoding API key</label>
-						<input type="text" class="form-control" id="api_key" name="api_key" maxlength="32" placeholder="key" required>
+						<label for="api_key" class="form-label">Klucz API geokodowania</label>
+						<input type="text" class="form-control" id="api_key" name="api_key" maxlength="32" placeholder="klucz" required>
 						<small id="passHelpBlock" class="form-text text-muted">
-							The API key should be 32 characters long.
+							Klucz API powinien mieć długość 32 znaków.
 						</small>
 					</div>
 					<div class="col-md-6">
-						<label for="refresh" class="form-label text-nowrap">Refresh period</label>
+						<label for="refresh" class="form-label text-nowrap">Częstotliwość odświeżania</label>
 						<select class="form-select" id="refresh" name="refresh">
 								<option value="1" selected>1h</option>
 								<option value="2">2h</option>
@@ -46,16 +46,16 @@
 								<option value="12">12h</option>
 						</select>
 						<small id="passHelpBlock" class="form-text text-muted">
-							Longer period improves battery life.
+							Częste odświeżanie może skrócić czas pracy na baterii.
 						</small>
 					</div>
 					<div class="col-md-12">
-						<label for="by_zip_code" class="form-label">Location by zip code</label>
+						<label for="by_zip_code" class="form-label">Lokalizacja przy pomocy kodu pocztowego</label>
 						<div class="input-group">
 							<div class="input-group-text">
 								<input class="form-check-input mt-0" type="radio" name="location_mode" value="zip_code" id="by_zip_code" checked>
 							</div>
-							<input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="10" placeholder="zip code">
+							<input type="text" class="form-control" id="zip_code" name="zip_code" maxlength="10" placeholder="kod pocztowy">
 							<select class="form-select" id="country" name="country">
 								<option value="AF">Afghanistan</option>
 								<option value="AX">Åland Islands</option>
@@ -310,27 +310,27 @@
 						</div>
 					</div>
 					<div class="col-md-12">
-						<label for="coords" class="form-label">Location by coordinates</label>
+						<label for="coords" class="form-label">Lokalizacja przy pomocy współrzędnych</label>
 						<div class="input-group">
 							<div class="input-group-text">
 								<input class="form-check-input mt-0" type="radio" name="location_mode" id="by_coor">
 							</div>
-							<input type="text" class="form-control" id="lat" name="lat" maxlength="10" placeholder="latitude">
-							<input type="text" class="form-control" id="lon" name="lon" maxlength="10" placeholder="longitude">
+							<input type="text" class="form-control" id="lat" name="lat" maxlength="10" placeholder="szerokość">
+							<input type="text" class="form-control" id="lon" name="lon" maxlength="10" placeholder="długość">
 						</div>
 						<small id="coorHelpBlock" class="form-text text-muted">
-							The coordinates use the point "." as the decimal separator.
+							Współrzędne wykorzystują kropkę "." jako separator dziesiętny.
 						</small>
 					</div>
 					<div class="col-12 justify-content-end">
-						<button id="submit_button" type="button" class="btn btn-primary">Save</button>
+						<button id="submit_button" type="button" class="btn btn-primary">Zapisz</button>
 					</div>
 				</fieldset></form>
 			</div>
 		</div>
 		<div class="text-center" id="waiting_anim">
 			<div class="spinner-grow text-primary" role="status">
-				<span class="visually-hidden">Loading...</span>
+				<span class="visually-hidden">Ładowanie...</span>
 			</div>
 		</div>
 	</div>
@@ -354,7 +354,7 @@
 					$("#by_coor").attr("checked", true);
 				}
 			}).fail(function(){
-				$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Error:</strong>  Device connection failed. Try again.</div>').fadeIn();
+				$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Błąd:</strong> Problem z połączeniem. Spróbuj ponownie.</div>').fadeIn();
 			}).always(function(){
 				$("fieldset").removeAttr("disabled");
 				$("#waiting_anim").hide();
@@ -375,7 +375,7 @@
 				if(tmpData.api_key.length > 0)
 				{
 					if(tmpData.api_key.length != 32){
-						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> Invalid API key. The API key should be 32 characters long.</div>').fadeIn();
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Błąd:</strong> Niepoprawny klucz API. Klucz powinien posiadać długość 32 znaków.</div>').fadeIn();
 						return;
 					}else{
 						jsonData["api_key"] = tmpData.api_key;
@@ -386,18 +386,18 @@
 					jsonData["country"] = tmpData.country;
 					jsonData["zip_code"] = tmpData.zip_code;
 					if(!("api_key" in jsonData)){
-						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> The API key is required when using the location by zip code</div>').fadeIn();
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Błąd:</strong> Klucz API ist wymagany, aby uzyskać lokalizację przy pomocy kodu pocztowego.</div>').fadeIn();
 						return;
 					}
 				}else{
 					if(!ValidateCoordinates(tmpData.lat) || parseInt(tmpData.lat) > 179 || parseInt(tmpData.lat) < -179)
 					{
-						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> Wrong latitude value.</div>').fadeIn();
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Błąd:</strong> Niepoprawna szerokość geograficzna.</div>').fadeIn();
 						return;
 					}
 					if(!ValidateCoordinates(tmpData.lon) || parseInt(tmpData.lon) > 89 || parseInt(tmpData.lon) < -89)
 					{
-						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> Wrong longitude value.</div>').fadeIn();
+						$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Błąd:</strong> Niepoprawna długość geograficzna.</div>').fadeIn();
 						return;
 					}
 					jsonData["lon"] = tmpData.lon;
@@ -406,7 +406,7 @@
 
 				if('zip_code' in jsonData && jsonData["zip_code"].length === 0)
 				{
-					$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Error:</strong> ZIP code cannot be empty.</div>').fadeIn();
+					$("#alert_container").html('<div class="alert alert-warning" role="alert"><strong>Błąd:</strong> Pole "kod pocztowy" nie może być puste.</div>').fadeIn();
 					return;
 				}
 				
@@ -416,10 +416,10 @@
 				$("#submit_button").attr("disabled", true);
 				
 				$.post("/api/fcast_conf", data, function(resp){
-					$("#alert_container").html('<div class="alert alert-success" role="alert"><strong>Success!</strong> Forecast settings changed.</div>').fadeIn();
+					$("#alert_container").html('<div class="alert alert-success" role="alert"><strong>Sukces!</strong> Ustawienia prognozy zostały zmienione.</div>').fadeIn();
 				}, "json")
 				.fail(function(){
-					$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Error:</strong> Device connection failed. Try again.</div>').fadeIn();
+					$("#alert_container").html('<div class="alert alert-danger" role="alert"><strong>Błąd:</strong> Problem z połączeniem. Spróbuj ponownie.</div>').fadeIn();
 				})
 				.always(function(){
 					$("#submit_button").removeAttr("disabled");
