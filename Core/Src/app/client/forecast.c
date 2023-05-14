@@ -418,10 +418,22 @@ static char* getNextJsonArrayValue(char* dataPtr)
     }
 }
 
-// calculate from km/h to m/s
+// calculate from km/h to Beaufort scale
 static uint8_t windSpeedScale(uint16_t windSpeed)
 {
-    return (windSpeed*10)/63;
+    if(windSpeed == 0)    return 0;
+    if(windSpeed <= 6)   return 1;
+    if(windSpeed <= 11)  return 2;
+    if(windSpeed <= 19)  return 3;
+    if(windSpeed <= 29)  return 4;
+    if(windSpeed <= 39) return 5;
+    if(windSpeed <= 50) return 6;
+    if(windSpeed <= 62) return 7;
+    if(windSpeed <= 75) return 8;
+    if(windSpeed <= 87) return 9;
+    if(windSpeed <= 102) return 10;
+    if(windSpeed <= 117) return 11;
+    return 12;
 }
 
 static EWeaterCondition codeToCondition(uint16_t weatherId)

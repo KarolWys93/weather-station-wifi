@@ -45,8 +45,32 @@
 				<li><strong>D -</strong> Temperature in &degC. The black line is the real temperature, the red line is the apparent temperature.</li>
 				<li><strong>E -</strong> Rain (black) in mm and snowfall (red) in cm. The red square means a storm.</li>
 				<li><strong>F -</strong> Atmospheric pressure in hPa.</li>
-				<li><strong>G -</strong> Wind speed (grey) and gusts (red) in m/s.</li>
+				<li><strong>G -</strong> Wind speed (grey) and gusts (red) in Beaufort scale.</li>
 				</ul></p>
+				<div class="table-responsive">
+				<table class="table table-striped table-sm">
+					<thead>
+					<tr>
+						<th scope="col">Beaufort number</th><th scope="col">Description</th><th scope="col">Wind speed</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr><th scope="row">0</th><td>Calm</td><td>< 2 km/h, < 0.5 m/s</td></tr>
+						<tr><th scope="row">1</th><td>Light air</td><td>2-5 km/h, 0.5-1.5 m/s</td></tr>
+						<tr><th scope="row">2</th><td>Light breeze</td><td>6-11 km/h, 1.6-3.3 m/s</td></tr>
+						<tr><th scope="row">3</th><td>Gentle breeze</td><td>12-19 km/h, 3.4-5.5 m/s</td></tr>
+						<tr><th scope="row">4</th><td>Moderate breeze</td><td>20-28 km/h, 5.6-7.9 m/s</td></tr>
+						<tr><th scope="row">5</th><td>Fresh breeze</td><td>29-38 km/h, 8.0-10.7 m/s</td></tr>
+						<tr><th scope="row">6</th><td>Strong breeze</td><td>39-49 km/h, 10.8-13.8 m/s</td></tr>
+						<tr><th scope="row">7</th><td>High wind</td><td>50-61 km/h, 13.9-17.1 m/s</td></tr>
+						<tr><th scope="row">8</th><td>Gale</td><td>62-74 km/h, 17.2-20.7 m/s</td></tr>
+						<tr><th scope="row">9</th><td>Strong gale</td><td>75-88 km/h, 20.8-24.4 m/s</td></tr>
+						<tr><th scope="row">10</th><td>Storm</td><td>89-102 km/h, 24.5-28.4 m/s</td></tr>
+						<tr><th scope="row">11</th><td>Violent storm</td><td>103-117 km/h, 28.5-32.6 m/s</td></tr>
+						<tr><th scope="row">12</th><td>Hurricane-force</td><td>≥ 118 km/h, ≥ 32.7 m/s</td></tr>
+					</tbody>
+				</table>
+				</div>
 				<h2>Config mode</h2>
 				<p>To enter configuration mode, hold the blue button on the back of the device while waking up (top button) or turning on the power (power switch).</p>
 				<p>In config mode, the device enables its own WiFi Access Point. The default WiFi name is <strong>WeatherStation_xxxx</strong> (where xxxx is the end of the serial number) and the password is <strong>littlefox123</strong>.
