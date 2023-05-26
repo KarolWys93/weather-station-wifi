@@ -43,6 +43,8 @@
 #include "led.h"
 #include "images.h"
 #include "sw_watchdog.h"
+#include "GUI/GUI_Paint.h"
+#include "e-Paper/EPD_1in54b.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -203,6 +205,9 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint16_t retryCounter = 0;
+
+  //Set display canvas setting
+  Paint_NewImage(NULL, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
 
   led_setColor(LED_GREEN);
   system_init();

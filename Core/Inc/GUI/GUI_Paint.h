@@ -48,6 +48,7 @@
 #define __GUI_PAINT_H
 
 #include "../Fonts/fonts.h"
+#include "../e-Paper/Config/DEV_Config.h"
 
 /**
  * Image attributes

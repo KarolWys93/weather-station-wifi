@@ -53,6 +53,7 @@
 #include <math.h>
 
 PAINT Paint;
+
 /******************************************************************************
 function:	Create Image
 parameter:
@@ -63,7 +64,6 @@ parameter:
 ******************************************************************************/
 void Paint_NewImage(UBYTE *image, UWORD Width, UWORD Height, UWORD Rotate, UWORD Color)
 {
-    Paint.Image = NULL;
     Paint.Image = image;
 
     Paint.WidthMemory = Width;

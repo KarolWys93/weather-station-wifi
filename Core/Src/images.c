@@ -180,9 +180,6 @@ void show_emptyForecast_image(void)
     uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
     uint8_t *d_red = d_black;
 
-    Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-    Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-
     load_forecastImg_BlackGrey(d_black, d_grey);
     EPD_SendBlackAndGrey(d_black, d_grey);
 
@@ -243,9 +240,6 @@ void show_error_image(ERR_IMAGE errImg, char* errText, char* subText)
 	uint8_t isCharging = system_powerStatus();
 	uint8_t batteryLvl = system_batteryLevel();
 
-	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-
 	switch (errImg)
 	{
 	    case ERR_IMG_MEMORY_CARD:
@@ -302,9 +296,6 @@ void show_configMode_image(void)
 	uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t *d_red = d_black;
 
-	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-
 	img_loadBlackGrey(CONFIG_MODE_IMG, d_black, d_grey);
 	EPD_SendBlackAndGrey(d_black, d_grey);
 
@@ -319,9 +310,6 @@ void show_low_bat_image(void)
 	uint8_t d_black[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t d_grey[(EPD_WIDTH/8) * EPD_HEIGHT];
 	uint8_t *d_red = d_black;
-
-	Paint_NewImage(d_black, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
-	Paint_NewImage(d_grey, EPD_WIDTH, EPD_HEIGHT, ROTATE_270, WHITE);
 
 	img_loadBlackGrey(LOW_BAT_IMG, d_black, d_grey);
 	Paint_SelectImage(d_black);
