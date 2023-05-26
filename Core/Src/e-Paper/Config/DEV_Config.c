@@ -28,7 +28,7 @@
 # THE SOFTWARE.
 #
 ******************************************************************************/
-#include "Config/DEV_Config.h"
+#include "e-Paper/Config/DEV_Config.h"
 #include "stm32f1xx_hal_spi.h"
 
 extern SPI_HandleTypeDef hspi1;

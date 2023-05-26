@@ -44,9 +44,9 @@
 * THE SOFTWARE.
 *
 ******************************************************************************/
+#include "e-Paper/Config/Debug.h"
+#include "e-Paper/Config/DEV_Config.h"
 #include "GUI/GUI_Paint.h"
-#include "Config/DEV_Config.h"
-#include "Config/Debug.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include "dma.h"
@@ -68,9 +68,9 @@ void Paint_NewImage(UBYTE *image, UWORD Width, UWORD Height, UWORD Rotate, UWORD
 
     Paint.WidthMemory = Width;
     Paint.HeightMemory = Height;
-    Paint.Color = Color;    
+    Paint.Color = Color;
     Paint.WidthByte = (Width % 8 == 0)? (Width / 8 ): (Width / 8 + 1);
-    Paint.HeightByte = Height;    
+    Paint.HeightByte = Height;
     Debug("WidthByte = %d, HeightByte = %d", Paint.WidthByte, Paint.HeightByte);
     Debug("EPD_WIDTH / 8 = %d",  122 / 8);
    
@@ -448,14 +448,11 @@ void Paint_DrawChar(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
             if (FONT_BACKGROUND == Color_Background) { //this process is to speed up the scan
                 if (*ptr & (0x80 >> (Column % 8)))
                     Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Foreground);
-                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
             } else {
                 if (*ptr & (0x80 >> (Column % 8))) {
                     Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Foreground);
-                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
                 } else {
                     Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Background);
-                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Background, DOT_PIXEL_DFT, DOT_STYLE_DFT);
                 }
             }
             //One pixel is 8 bits
@@ -510,74 +507,6 @@ void Paint_DrawString(UWORD Xstart, UWORD Ystart, const char * pString,
     }
 }
 
-/******************************************************************************
-function:	Display nummber
-parameter:
-    Xstart           X coordinate
-    Ystart           : Y coordinate
-    Nummber          : The number displayed
-    Font             A structure pointer that displays a character size
-    Color_Background : Select the background color of the English character
-    Color_Foreground : Select the foreground color of the English character
-******************************************************************************/
-#define  ARRAY_LEN 255
-void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, int32_t Nummber,
-                   sFONT* Font, UWORD Color_Background, UWORD Color_Foreground )
-{
-
-    int16_t Num_Bit = 0, Str_Bit = 0;
-    uint8_t Str_Array[ARRAY_LEN] = {0}, Num_Array[ARRAY_LEN] = {0};
-    uint8_t *pStr = Str_Array;
-
-    if (Xpoint > Paint.Width || Ypoint > Paint.Height) {
-        Debug("Paint_DisNum Input exceeds the normal display range");
-        return;
-    }
-
-    //Converts a number to a string
-    while (Nummber) {
-        Num_Array[Num_Bit] = Nummber % 10 + '0';
-        Num_Bit++;
-        Nummber /= 10;
-    }
-
-    //The string is inverted
-    while (Num_Bit > 0) {
-        Str_Array[Str_Bit] = Num_Array[Num_Bit - 1];
-        Str_Bit ++;
-        Num_Bit --;
-    }
-
-    //show
-    Paint_DrawString(Xpoint, Ypoint, (const char*)pStr, Font, Color_Background, Color_Foreground);
-}
-
-/******************************************************************************
-function:	Display time
-parameter:
-    Xstart           X coordinate
-    Ystart           : Y coordinate
-    pTime            : Time-related structures
-    Font             A structure pointer that displays a character size
-    Color            : Select the background color of the English character
-******************************************************************************/
-void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font,
-                    UWORD Color_Background, UWORD Color_Foreground)
-{
-    uint8_t value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
-    UWORD Dx = Font->Width;
-
-    //Write data into the cache
-    Paint_DrawChar(Xstart                           , Ystart, value[pTime->Hour / 10], Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx                      , Ystart, value[pTime->Hour % 10], Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx  + Dx / 4 + Dx / 2   , Ystart, ':'                    , Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx * 2 + Dx / 2         , Ystart, value[pTime->Min / 10] , Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx * 3 + Dx / 2         , Ystart, value[pTime->Min % 10] , Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':'                    , Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx * 5                  , Ystart, value[pTime->Sec / 10] , Font, Color_Background, Color_Foreground);
-    Paint_DrawChar(Xstart + Dx * 6                  , Ystart, value[pTime->Sec % 10] , Font, Color_Background, Color_Foreground);
-}
 
 /******************************************************************************
 function:	Display monochrome bitmap

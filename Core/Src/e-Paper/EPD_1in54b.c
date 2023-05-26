@@ -35,8 +35,8 @@
 # THE SOFTWARE.
 #
 ******************************************************************************/
+#include "e-Paper/Config/Debug.h"
 #include "e-Paper/EPD_1in54b.h"
-#include "Config/Debug.h"
 
 
 const unsigned char lut_vcom0[] = {

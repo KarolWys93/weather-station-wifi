@@ -33,7 +33,7 @@
 #ifndef _EPD1IN54B_H_
 #define _EPD1IN54B_H_
 
-#include "Config/DEV_Config.h"
+#include "e-Paper/Config/DEV_Config.h"
 
 // Display resolution
 #define EPD_WIDTH       200

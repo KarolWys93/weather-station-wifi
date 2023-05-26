@@ -5,6 +5,7 @@
  *      Author: Karol
  */
 
+#include "e-Paper/Config/DEV_Config.h"
 #include "system.h"
 #include "fatfs.h"
 #include "logger.h"
@@ -16,7 +17,6 @@
 #include "wifi/wifi_esp.h"
 
 #include "e-Paper/EPD_1in54b.h"
-#include "Config/DEV_Config.h"
 #include "GUI/GUI_Paint.h"
 #include "e-Paper/ImageData.h"
 
