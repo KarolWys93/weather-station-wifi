@@ -80,4 +80,6 @@
 #define DEV_Delay_ms(__xms) system_sleep(__xms)
 
 void DEV_SPI_WriteByte(UBYTE value);
+void DEV_SPI_AsyncWriteBytes(UBYTE *value, UWORD size);
+void DEV_SPI_WaitForEndAsyncWrite(void);
 #endif

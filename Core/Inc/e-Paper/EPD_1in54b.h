@@ -76,6 +76,8 @@ void EPD_Display(const UBYTE *blackimage, const UBYTE *redimage);
 void EPD_Sleep(void);
 
 void EPD_SendBlackAndGrey(const UBYTE *blackimage, const UBYTE *greyimage);
+void EPD_SendBlackAndGrey300(const UBYTE *blackimage, const UBYTE *greyimage);
+
 void EPD_SendRed(const UBYTE *redimage);
 void EPD_Refresh(void);
 

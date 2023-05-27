@@ -37,4 +37,16 @@ void DEV_SPI_WriteByte(UBYTE value)
 	HAL_SPI_Transmit(&hspi1, &value, 1, 1000);
 }
 
+void DEV_SPI_AsyncWriteBytes(UBYTE *data, UWORD size)
+{
+    HAL_SPI_Transmit_DMA(&hspi1, data, size);
+}
+
+void DEV_SPI_WaitForEndAsyncWrite(void)
+{
+    while(HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY)
+    {
+        DEV_Delay_ms(1);
+    }
+}
 
