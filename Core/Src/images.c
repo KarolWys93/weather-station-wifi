@@ -41,8 +41,9 @@ static void img_loadBlackGrey(ImageName imgName, uint8_t* blackBuff, uint8_t* gr
 static void img_loadRed(ImageName imgName, uint8_t* redBuff);
 
 static uint8_t readImgFile(char* filePath, uint8_t* buffer, uint32_t size);
+#ifdef DEBUG
 static uint8_t saveImgFile(char* filePath, uint8_t* buffer, uint32_t size);
-
+#endif
 
 static uint8_t loadFromMemory(ImageName imgName, BufferType bufferType)
 {
@@ -141,6 +142,7 @@ static uint8_t readImgFile(char* filePath, uint8_t* buffer, uint32_t size)
 	}
 }
 
+#ifdef DEBUG
 static uint8_t saveImgFile(char* filePath, uint8_t* buffer, uint32_t size)
 {
 	FIL file;
@@ -163,6 +165,7 @@ static uint8_t saveImgFile(char* filePath, uint8_t* buffer, uint32_t size)
 		return 0;
 	}
 }
+#endif
 
 void load_forecastImg_BlackGrey(uint8_t* black_buff, uint8_t* grey_buff)
 {
