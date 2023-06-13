@@ -58,7 +58,7 @@ The output is a text file. The content of the file should be copy to source code
 
 ## "Screenshots" and back conversion
 
-For debugging purposes, display buffers can be dumped to files. The dumps are saved as epd files in ***/img/src*** directory.
+For debugging purposes, display buffers can be dumped to files. The dumps are saved as epd files in ***/img/scr*** directory.
 The epd files can be converted to image using script ***scr2img.py***. Example:
 
 `python res/scripts/scr2img.py b.epd g.epd r.epd output_img.bmp`
