@@ -13,3 +13,6 @@ The script creates a new directory *"compressed"*, copies the *"html"* directory
 The test server can be used to test a website locally without the weather station device.
 To enable test server, run the ***server_test.bat*** script. The script copies the static and mock files to the "test_server" directory and then starts a simple Python HTTP server. The server is listening for a connection on port **8000**.
 The server works on a copy of the files, so any changes will be visible after restarting the server.
+
+## Server web API
+The web server API documentation can be found [here](../Docs/http_api_docs.md).
