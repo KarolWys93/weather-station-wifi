@@ -1,7 +1,8 @@
 # weather-station-wifi
  **Useful links:**
  - [User Manual](Docs/user_manual.md)
- - [Hardware project](Hardware_project/README.md)
+ - [Electronics project](Hardware/electronics/README.md)
+ - [Device case project](Hardware/case/README.md)
  - [Local development server](html/README.md)
  - [Web Server API](Docs/http_api_docs.md)
  - [Generation of display images](res/README.md)

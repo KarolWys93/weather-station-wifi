@@ -12,7 +12,7 @@
     *   yellow - indicates restart after hang-up condition
     *   cyan - factory reset
     *   white - critical error occurred. Manual restart needed
-*   **Wake-up button:** Wakes the device from sleep mode. If the config mode button (blue) is pressed during wake up, the device enters setup mode. A longer press of the button while the device is in configuration mode will exit this mode.
+    *   **Wake-up button:** Wakes the device from sleep mode.
 
 ## Forecast display
 
@@ -47,7 +47,7 @@ Legend:
 
 ## Config mode
 
-To enter configuration mode, hold the blue button on the back of the device while waking up (top button) or turning on the power (power switch).
+To enter the configuration mode, hold the blue button on the back of the device and at the same time wake up the device by pressing the wake-up button (on the top of the case) or turning on the power (power switch).
 
 In config mode, the device enables its own WiFi Access Point. The default WiFi name is **WeatherStation\_xxxx** (where xxxx is the end of the serial number) and the password is **littlefox123**. The default WiFi name and password can be changed in the Access Point tab.
 
