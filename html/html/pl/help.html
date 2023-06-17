@@ -20,6 +20,12 @@
 		<div class="row justify-content-center">
 			<div class="col-8">
 				<h1>Instrukcja obsługi</h1>
+				<h2>Pierwsze kroki</h2>
+				<p>Podczas pierwszego uruchomienia urządzenia należy je skonfigurować:
+				<ul>
+				<li>W zakładce <a href="forecast.html">Prognoza</a> należy umieścić informacje o lokalizacji, dla której checmy uzyskać prognozę.</li>
+				<li>W zakładce <a href="wifi-con.html">Połączenie Wi-Fi</a> należy wybrać z jakiej sieci WiFi będzie korzystać urządzenie w celu połączenia z Internetem.</li>
+				</ul></p>
 				<h2>Front urządzenia</h2>
 				<div class="text-center"><img src="img/front.png" alt="Widok przodu urządzenia"></div>
 				<p><ul>
@@ -29,20 +35,20 @@
 					<li>zielony - urządzenie jest aktywne</li>
 					<li>niebieski - urządzenie w trybie konfiguracji</li>
 					<li>czerwony - wystąpił błąd urządzenia</li>
-					<li>żółty - inforumje, że wystąpił restart po wykryciu zawieszenia urządzenia</li>
-					<li>cyan - przywracanie ustawień fabrycznych</li>
-					<li>white - błąd krytyczny. Wymagane ręczne ponowne uruchomienie</li>
+					<li>żółty - informuje, że wystąpił restart po wykryciu zawieszenia urządzenia</li>
+					<li>cyjan - przywracanie ustawień fabrycznych</li>
+					<li>biały - błąd krytyczny, wymagane ręczne ponowne uruchomienie</li>
 				</ul></li>
-				<li><strong>Przycisk wybudzania:</strong> Wybudza urządzenie z uśpienia. Jeżeli przycisk trybu konfiguracji (niebieski) jest wciśnięty podczas wybudzania, urządzenie uruchomi się w trybie konfiguracji. Dłuższe przytrzymanie przycisku będąc w trybie konfiguracji spowoduje opuszczenie tego trybu.</li>
+				<li><strong>Przycisk wybudzania:</strong> Wybudza urządzenie z uśpienia.</li>
 				</ul></p>
 				<h2>Ekran prognozy</h2>
 				<div class="text-center"><img src="/img/fcast.png" alt="example forecast display"></div>
-				<p>Legend:<ul>
+				<p>Legenda:<ul>
 				<li><strong>A -</strong> Data prognozy.</li>
 				<li><strong>B -</strong> Poziom naładowania baterii.</li>
 				<li><strong>C -</strong> Linia czasu. Różowe linie oddzielają 3 godzinne segmenty. Linia przerywana oddziela kolejne dni.</li>
-				<li><strong>D -</strong> Temperatura w &degC. Czarna linia przedstawia temperaturę rzeczywistą, a czerwona temperature odczuwalną.</li>
-				<li><strong>E -</strong> Deszcz (czarny) w mm oraz opady śniegu(czerwony) w cm. Czerwony prostokąd symbolizuje burzę.</li>
+				<li><strong>D -</strong> Temperatura w &degC. Czarna linia przedstawia temperaturę rzeczywistą, a czerwona temperaturę odczuwalną.</li>
+				<li><strong>E -</strong> Deszcz (czarny) w mm oraz opady śniegu(czerwony) w cm. Czerwony prostokąt oznacza burzę.</li>
 				<li><strong>F -</strong> Ciśnienie atmosferyczne w hPa.</li>
 				<li><strong>G -</strong> Prędkość wiatru (szary) wraz z porywami (czerwony) w skali Beauforta.</li>
 				</ul></p>
@@ -50,7 +56,7 @@
 				<table class="table table-striped table-sm">
 					<thead>
 					<tr>
-						<th scope="col">Beaufort number</th><th scope="col">Description</th><th scope="col">Wind speed</th>
+						<th scope="col">Skala</th><th scope="col">Opis</th><th scope="col">Prędkość wiatru</th>
 					</tr>
 					</thead>
 					<tbody>
@@ -71,9 +77,10 @@
 				</table>
 				</div>
 				<h2>Tryb konfiguracji</h2>
-				<p>Aby wejść w tryb konfiguracji należy przytrzymać niebieski przycisk z tyłu urządzenia podczas wybudzania (górny przycisk) lub włączania zasilania (wyłącznik).</p>
 				<p>W trybie konfiguracji urządzenie włącza własny punkt dostępowy WiFi. Domyślna nazwa sieci Wi-Fi to <strong>WeatherStation_xxxx</strong> (gdzie xxxx to koniec numeru seryjnego), a hasło to <strong>littlefox123</strong>. Domyślną nazwę WiFi i hasło można zmienić w zakładce <a href="wifi-ap.html">Access Point</a>.</p>
-				<p>Strona konfiguracyjna jest dostępna pod adresem <a href="http://192.168.4.1">http://192.168.4.1</a>. Aby wyjść z trybu konfiguracji należy przytrzymać przycisk wybudzania lub wybrać odpowiednią opcję w zakładce <a href="system.html">System</a></p>
+				<p>Aby wejść w tryb konfiguracji należy przytrzymać niebieski przycisk z tyłu urządzenia i równocześnie wybudzić urządzenie poprzez naciśnięcie przycisku wybudzania (na górze obudowy) lub włączenie zasilania (wyłącznik).</p>
+				<p>Strona konfiguracyjna jest dostępna pod adresem <a href="http://192.168.4.1">http://192.168.4.1</a>.</p>
+				<p>Aby wyjść z trybu konfiguracji należy przytrzymać przycisk wybudzania lub zrestartować urządznie w zakładce <a href="system.html">System</a></p>
 				<h2>Przywrócenie ustawień fabrycznych</h2>
 				<p>Urządzenie można przywrócić do ustawień domyślnych w zakładce <a href="system.html">System</a>. Reset do ustawień fabrycznych można również wykonać, przytrzymując żółty przycisk z tyłu urządzenia podczas włączania zasilania.
 				Po przywróceniu ustawień fabrycznych urządzenie uruchomi się ponownie w trybie konfiguracji.</p>
