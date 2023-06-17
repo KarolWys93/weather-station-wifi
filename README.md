@@ -23,6 +23,13 @@ The task of the forecast client is to decode the postcode to the coordinates (if
 
 The HTTP server is used in configuration mode. In the configuration mode, the WiFi module starts its own AccessPoint, and the HTTP server provides the configuration website.
 
+## SD Card preparation
+The device uses an SD memory card to store static HTML files, graphics, configurations and logs. The first partition on the memory card should be formatted as FAT32 with a block size of 512B. Partition size can be up to 2GB.
+
+A freshly formatted memory card should contain the following directories:
+- `img` - contains images (see [Generation of display images](res/README.md))
+- `html` - contains static html files (see [Local development server](html/README.md))
+
 ## Device visualization:
 | Front of the device | 3D view of the device |
 |--|--|

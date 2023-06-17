@@ -40,39 +40,8 @@ static uint8_t g_linkID;
 static int8_t handleRequest(char* requestPtr, uint16_t requestSize);
 static HTTP_STATUS staticFileRequest(char* requestPtr, uint16_t requestSize, char* path);
 static HTTP_STATUS errorResponse(uint16_t errorCode);
-static HTTP_STATUS mrSandMan(void);
 
 static int32_t httpServer_sendDataWaitLess(char* data, uint16_t data_size);
-
-static HTTP_STATUS mrSandMan(void)
-{
-    const char* const popFile = "/html/vid/sandman.webm";
-    FIL file;
-    FILINFO fileInfo;
-    uint32_t fileSize = 0;
-    uint32_t headerSize = 0;
-    char responseBuffer[HTTP_SERVER_RESPONSE_SIZE];
-
-    DMA_memset(&fileInfo, 0, sizeof(FILINFO));
-
-    if(FR_OK == f_stat(popFile, &fileInfo))
-    {
-        fileSize = fileInfo.fsize;
-    }
-
-    headerSize = HTTP_createResponseHeader(responseBuffer, sizeof(responseBuffer), 200, fileSize);
-    if(headerSize < 0)
-    {
-        return HTTP_SERVER_NOT_FOUND;
-    }
-
-    if(fileSize > 0 && FR_OK == f_open(&file, popFile, FA_READ))
-    {
-        httpServer_sendFile(&file, responseBuffer, sizeof(responseBuffer), headerSize, fileSize);
-    }
-    f_close(&file);
-    return HTTP_SERVER_OK;
-}
 
 static HTTP_STATUS errorResponse(uint16_t errorCode)
 {
@@ -264,10 +233,6 @@ static int8_t handleRequest(char* requestPtr, uint16_t requestSize)
         else if(0 == strcmp(path, "/api/img_test"))
         {
             status = serverAPI_imgTest(requestPtr, requestSize);
-        }
-        else if(0 == strcmp(path, "/pop"))
-        {
-            status = mrSandMan();
         }
         else
         {
