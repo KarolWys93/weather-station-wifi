@@ -234,6 +234,10 @@ static int8_t handleRequest(char* requestPtr, uint16_t requestSize)
         {
             status = serverAPI_imgTest(requestPtr, requestSize);
         }
+        else if(0 == strcmp(path, "/api/fcast_tmp"))
+        {
+            status = serverAPI_getForecastTmp(requestPtr, requestSize);
+        }
         else
         {
             status = staticFileRequest(requestPtr, requestSize, path);

@@ -1178,3 +1178,36 @@ HTTP_STATUS serverAPI_imgTest(char* request, uint32_t reqSize)
 
     return sendResponse(204, NULL, 0);
 }
+
+HTTP_STATUS serverAPI_getForecastTmp(char* request, uint32_t reqSize)
+{
+    FIL file;
+    FILINFO fileInfo;
+    uint32_t fileSize = 0;
+    uint32_t headerSize = 0;
+    char responseBuffer[2048];
+
+    DMA_memset(&fileInfo, 0, sizeof(FILINFO));
+
+    if(FR_OK == f_stat(FILE_PATH_FCAST_TMP, &fileInfo))
+    {
+        fileSize = fileInfo.fsize;
+    }
+    else
+    {
+        return HTTP_SERVER_NOT_FOUND;
+    }
+
+    headerSize = HTTP_createResponseHeader(responseBuffer, sizeof(responseBuffer), 200, fileSize);
+    if(headerSize < 0)
+    {
+        return HTTP_SERVER_ERROR;
+    }
+
+    if(fileSize > 0 && FR_OK == f_open(&file, FILE_PATH_FCAST_TMP, FA_READ))
+    {
+        httpServer_sendFile(&file, responseBuffer, sizeof(responseBuffer), headerSize, fileSize);
+    }
+    f_close(&file);
+    return HTTP_SERVER_OK;
+}

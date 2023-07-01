@@ -314,3 +314,8 @@ Images:
  5. General error image
 
 Response code: 204 on success or 400 on invalid img number
+
+### GET /api/fcast_tmp
+Returns the last forecast file
+
+Response code: 200 on success or 404 if the file does not exist.
