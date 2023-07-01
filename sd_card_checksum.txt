@@ -1,2 +1,32 @@
-tar -cf - --exclude 'img/scr' html/ img/ | md5sum
-6922dbacc3268a4672f7592e9403a829 *-
+#  md5sum $(find ./img/ ./html/ -type f)
+656183db8204d4caddcfc3f8a9220aba *./img/2_b.epd
+ebe92c795a264899da7875504efb9dcd *./img/2_g.epd
+45e774007f672dfad56ec3f667fcbb90 *./img/3_b.epd
+eee3d4bc52af4bfce6c86e0dcd47776b *./img/3_r.epd
+3c0d1e53952c5acc273958f19860c948 *./img/4_b.epd
+13cbf2306ba2cc0404b7941afd1ed8ae *./img/4_r.epd
+41b2dd4d7b1e997f82a4253f2b72bd99 *./img/5_b.epd
+df309ef6ee7775a81e0b38fb8c7e32c0 *./img/5_r.epd
+bdb4cf3eacfeffc3aed4f90bf87c5690 *./img/empty.epd
+b325be4caa98fa4446a24ef7763a0017 *./html/404.html
+602fe81e81cfd384a67eda28eb017f07 *./html/ccs/bootstrap.min.css
+ebd462f3fbac0a2eeee579525cf4b9f3 *./html/forecast.html
+de698cc82265f732647ab341137deedc *./html/header.html
+0591fad0dec43d66d0ac38e6bd204d31 *./html/help.html
+8815c92e030eb90a3bac072db440e299 *./html/img/fcast.png
+9db7f2645b19d8e6d3f682cbfca0583b *./html/img/front.png
+f1fa29a0e67b0431d492823568936832 *./html/img/weather-icon.png
+b133863d45b0fb6443423302737a9b51 *./html/index.html
+dce987bf2eda1a77f9ac2350a1f02e25 *./html/pl/forecast.html
+8189550b6b1791af502031c50b462a5f *./html/pl/header.html
+e14e8885ca58637381899bb28bdd75a2 *./html/pl/help.html
+355fb3d473bd705f7f3850562b59cafe *./html/pl/img/front.png
+58fd4a4ab4da6dfcaab2726fdd2e9098 *./html/pl/index.html
+109ba0a8aef786c4f8979c7122cf157e *./html/pl/system.html
+bd59c9273912abf3080db566b9bd575e *./html/pl/wifi-ap.html
+81673740d25ab1f5c16ec89e9f016344 *./html/pl/wifi-con.html
+4eaa041c7a0df42f61cb8ce6b8da9b2e *./html/scripts/bootstrap.bundle.min.js
+d1e8f6ef1f8e949736ac9848ef9406e0 *./html/scripts/jquery-3.5.1.min.js
+984033037543502ad8cd8c8b57698f6b *./html/system.html
+c8942a5a2091f602b21350b3d1add989 *./html/wifi-ap.html
+4b5bc5dd8fa2b7dee334d8689ca7de33 *./html/wifi-con.html
