@@ -1,8 +1,8 @@
 # weather-station-wifi
  **Useful links:**
  - [User Manual](Docs/user_manual.md)
- - [Electronics project](Hardware/electronics/README.md)
- - [Device case project](Hardware/case/README.md)
+ - [Electronics](Hardware/electronics/README.md)
+ - [Device case](Hardware/case/README.md)
  - [Local development server](html/README.md)
  - [Web Server API](Docs/http_api_docs.md)
  - [Generation of display images](res/README.md)
@@ -11,7 +11,7 @@
 ## General description
 This is a project of a weather station with WiFi module. The presented forecasts come from the [open-meteo](https://open-meteo.com/) service.
 
-The device is based on the **STM32F103CBT6** microcontroller and the popular WiFi module: **ESP32-C3-WROOM-02**. The WiFi module works in the AT commands mode. The project uses a 1.54" 3-color [e-Paper display](https://www.waveshare.com/1.54inch-e-paper-module-b.htm) with a resolution of 200x200 px.
+The device is based on the **STM32F103CBT6** microcontroller and the popular WiFi module: **ESP32-C3-WROOM-02**. The WiFi module uses AT command control mode. The project uses a 1.54" 3-color [e-Paper display](https://www.waveshare.com/1.54inch-e-paper-module-b.htm) with a resolution of 200x200 px.
 
 Block diagram of the device:
 

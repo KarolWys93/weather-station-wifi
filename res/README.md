@@ -1,6 +1,6 @@
 # Images
 
-The E-Paper display used in the device has a resolution of 200x200 pixels and supports up to 6 colors: black, white, red, gray and pink. The display driver uses 3 "images" for black, gray and pink. A red color pixel is obtained when the same pixel is set for a black and pink "image".
+The E-Paper display used in the device has a resolution of 200x200 pixels and supports up to 5 colors: black, white, red, gray and pink. The display driver uses 3 "images" for black, gray and pink. A red color pixel is obtained when the same pixel is set for a black and pink "image".
 
 ## Image list
 

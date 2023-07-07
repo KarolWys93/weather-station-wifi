@@ -66,7 +66,7 @@ Example of response:
     ]
 Fields in response:
  - **ssid** - network name
- - **ap_enc** - encryption: 0 - open, 2 - WPA PSK, 3 - WPA2 PSK, 4 - WPA WPA2 PSK
+ - **enc** - encryption: 0 - open, 2 - WPA PSK, 3 - WPA2 PSK, 4 - WPA WPA2 PSK
  - **rssi** - Wi-Fi signal strength (dBm)
 
 ### GET /api/wifi_conf

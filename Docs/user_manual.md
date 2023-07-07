@@ -22,7 +22,7 @@ Legend:
 
 *   **A -** Forecast date.
 *   **B -** Battery level.
-*   **C -** Time line. The pink line separates the 3 hour segments. The dashed line separates the days.
+*   **C -** Time line. The pink vertical line separates the 3 hour segments. The dashed line separates the days.
 *   **D -** Temperature in °C. The black line is the real temperature, the red line is the apparent temperature.
 *   **E -** Rain (black) in mm and snowfall (red) in cm. The red square means a storm.
 *   **F -** Atmospheric pressure in hPa.
