@@ -28,3 +28,4 @@ The HTTP server is used in configuration mode. In the configuration mode, the Wi
 | Front of the device | 3D view of the device |
 |--|--|
 | ![front of device](Docs/img/front_demo.png) | ![3D device image](Docs/img/weather_station_3d.png) |
+| ![photo of the device from the front](Docs/img/1.jpg) | ![photo of the device from the back](Docs/img/2.jpg) |
