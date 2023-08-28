@@ -11,8 +11,8 @@
 #include <stdbool.h>
 
 //power source
-#define BAT_VOLTAGE_100    4000 //4000 mV
-#define BAT_VOLTAGE_0      3330 //3330 mV
+#define BAT_VOLTAGE_100    4050 //4050 mV
+#define BAT_VOLTAGE_0      3425 //3425 mV
 
 #define BAT_VOLTAGE_SAMPLES 8
 #define BAT_VOLT_FILTER_DATA 8

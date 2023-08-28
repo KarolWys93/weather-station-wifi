@@ -235,6 +235,7 @@ int main(void)
 	  }
 	  else
 	  {
+	      sw_watchdog_reset();
 		  retryCounter++;
 		  Logger(LOG_ERR, "WiFi restart failed %d times", retryCounter);
 		  if(retryCounter > 5)
