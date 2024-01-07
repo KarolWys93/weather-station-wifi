@@ -123,12 +123,17 @@ void drawForecast(const SForecast * const forecastData)
 
     if(minTempRange < 0)
     {
+        uint16_t startLine = 21; //top of chart
         Paint_SelectImage(d_grey);
-        Paint_DrawRectangle(31, (51*minTempRange)/(maxTempRange-minTempRange)+73, 199, 73, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
+        if(maxTempRange > 0)
+        {
+            startLine = (51*minTempRange)/(maxTempRange-minTempRange)+73;
+        }
+        Paint_DrawRectangle(31, startLine, 199, 73, BLACK, DRAW_FILL_FULL, DOT_PIXEL_1X1);
         Paint_SelectImage(d_black);
     }
 
-    avrTempLine = (-51*(((maxTempRange + minTempRange)/2)-minTempRange))/(maxTempRange-minTempRange) + 72;
+    avrTempLine = 46;//half of the chart
     Paint_DrawLine(31, avrTempLine, 199, avrTempLine, BLACK, LINE_STYLE_DOTTED, DOT_PIXEL_1X1);
 
     for(uint8_t i = 0; i < DISPLAY_DATA_SIZE; i++)
